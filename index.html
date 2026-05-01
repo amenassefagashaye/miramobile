@@ -7,7 +7,6 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Times New Roman', Times, serif; }
-    /* Animated background gradient instead of blueFlash for smoother mobile performance */
     body { 
       display: flex; 
       align-items: center; 
@@ -45,7 +44,6 @@
       position: relative;
     }
     .active-page { display: flex; }
-    /* Enhanced touch-friendly buttons */
     .action-btn, .member-btn, .admin-panel-btn, .withdraw-btn, .close-overlay {
       background: #0066cc !important;
       color: white !important;
@@ -138,7 +136,6 @@
       cursor: default; 
       padding: 6px 6px; 
     }
-    /* Fullscreen toggle button in header - touch optimized */
     .header-fs-btn { 
       background: rgba(255,255,255,0.15) !important; 
       border: none !important; 
@@ -263,11 +260,6 @@
       .board-cell { font-size: 0.65rem; }
       .header-title { font-size: 0.85rem; }
     }
-    @media (max-width: 380px) {
-      .board-number { width: 48px; font-size: 0.65rem; }
-      .control-rect-btn { min-width: 50px; }
-    }
-    /* Improve scrolling */
     .boards-carousel::-webkit-scrollbar { height: 4px; }
     .boards-carousel::-webkit-scrollbar-track { background: #1e3a34; border-radius: 10px; }
     .boards-carousel::-webkit-scrollbar-thumb { background: #ffaa33; border-radius: 10px; }
@@ -275,7 +267,7 @@
 </head>
 <body>
 <div class="container" id="appContainer">
-  <!-- PAGE 0 · LOGIN -->
+  <!-- PAGE 0 · LOGIN with DOOR -->
   <div class="page active-page" id="page0">
     <button class="fullscreen-icon-only" id="fullscreenToggle">⛶</button>
     <button class="lang-btn-icon" id="langToggleBtn">🌐</button>
@@ -332,13 +324,48 @@
 
 <script>
 (function(){
-  // Languages (15 languages - abbreviated for brevity, same as original)
+  // ======================= FULLSCREEN FUNCTIONALITY (UNIFIED) =======================
+  function enterFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen().catch(err => console.log("Fullscreen error:", err));
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    }
+  }
+  function exitFullscreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(err => console.log("Exit fullscreen error:", err));
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  }
+  function toggleFullscreen() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      enterFullscreen();
+    } else {
+      exitFullscreen();
+    }
+  }
+  // Attach to all fullscreen buttons
+  const fsButtons = ['fullscreenToggle', 'headerFsPage1', 'headerFsPage2', 'headerFsPage3'];
+  fsButtons.forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleFullscreen(); });
+  });
+
+  // ======================= LANGUAGES (15 supported) =======================
   const languages = {
     en: { name:'English', flag:'🇬🇧', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Players', agentsLabel:'Agents', fullNameLabel:'📛 Full Name', phoneLabel:'📞 Phone', paymentLabel:'💰 Payment', gameAmountLabel:'🎮 Game Amount', roundsLabel:'🔄 Rounds', backToWelcomeBtn:'◀ Back', boardSelectionBtn:'🎲 Board', startGameBtn:'Start ▶', checkWinnerOption:'Check Winner', notifyWinBtn:'🏆 Win', callToggleBtn:'🎲 Call', backToRegIconBtn:'◀ Back', summaryIconBtn:'Next ▶', paidLabel:'💵 Paid', wonLabel:'🏆 Won', commissionLabel:'🤝 Commission', rewardLabel:'🎁 Reward', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Total Balance', withdrawLabel:'💸 Withdraw', backToGameFromSummary:'◀ Back', withdrawCallBtn:'Withdraw', stopCall:'Stop', roundText:'Round', roleSelectLabel:'🎭 Register as', playerOption:'👤 Player', agentOption:'🤝 Agent' },
-    am: { name:'አማርኛ', flag:'🇪🇹', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጫዋቾች', agentsLabel:'ወኪሎች', fullNameLabel:'📛 ሙሉ ስም', phoneLabel:'📞 ስልክ', paymentLabel:'💰 ክፍያ', gameAmountLabel:'🎮 የጨዋታ መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'አሸናፊ አረጋግጥ', notifyWinBtn:'🏆 አሸናፊ', callToggleBtn:'ደውል', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጥል', paidLabel:'💵 የተከፈለ', wonLabel:'🏆 ያሸነፈ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ጠቅላላ ቀሪ', withdrawLabel:'💸 መውጫ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'አውጣ', stopCall:'አቁም', roundText:'ዙር', roleSelectLabel:'🎭 የተመዘገበው እንደ', playerOption:'👤 ተጫዋች', agentOption:'🤝 ወኪል' }
+    am: { name:'አማርኛ', flag:'🇪🇹', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጫዋቾች', agentsLabel:'ወኪሎች', fullNameLabel:'📛 ሙሉ ስም', phoneLabel:'📞 ስልክ', paymentLabel:'💰 ክፍያ', gameAmountLabel:'🎮 የጨዋታ መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'አሸናፊ አረጋግጥ', notifyWinBtn:'🏆 አሸናፊ', callToggleBtn:'ደውል', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጥል', paidLabel:'💵 የተከፈለ', wonLabel:'🏆 ያሸነፈ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ጠቅላላ ቀሪ', withdrawLabel:'💸 መውጫ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'አውጣ', stopCall:'አቁም', roundText:'ዙር', roleSelectLabel:'🎭 የተመዘገበው እንደ', playerOption:'👤 ተጫዋች', agentOption:'🤝 ወኪል' },
+    om: { name:'Afaan Oromo', flag:'🇪🇹', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Taphattoota', agentsLabel:'Agentoota', fullNameLabel:'📛 Maqaa', phoneLabel:'📞 Bilbila', paymentLabel:'💰 Kaffaltii', gameAmountLabel:'🎮 Hamma Tapha', roundsLabel:'🔄 Marsaa', backToWelcomeBtn:'◀ Duuba', boardSelectionBtn:'🎲 Gabatee', startGameBtn:'Jalqabi', checkWinnerOption:'Mo’ataa ilaali', notifyWinBtn:'🏆 Mo’ataa', callToggleBtn:'Waami', backToRegIconBtn:'◀ Duuba', summaryIconBtn:'Itti fufi', paidLabel:'💵 Kaffalame', wonLabel:'🏆 Mo’ate', commissionLabel:'🤝 Komishinii', rewardLabel:'🎁 Badhaasa', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Dhibbaa Guutuu', withdrawLabel:'💸 Baafata', backToGameFromSummary:'◀ Duuba', withdrawCallBtn:'Baasi', stopCall:'Dhaabi', roundText:'Marsaa', roleSelectLabel:'🎭 Akka galmeesse', playerOption:'👤 Taphataa', agentOption:'🤝 Agenti' }
   };
-  // Add remaining languages (om, so, ti, ar, es, fr, de, pt, tr) - simplified for brevity but functional
-  ['om','so','ti','ar','es','fr','de','pt','tr'].forEach(code => { if(!languages[code]) languages[code] = languages.en; });
+  // Add remaining languages
+  ['so','ti','ar','es','fr','de','pt','tr','ru','zh'].forEach(code => { if(!languages[code]) languages[code] = languages.en; });
   
   let currentLang = localStorage.getItem('bingo_lang') || 'en';
   function t(key) { return languages[currentLang]?.[key] || languages['en'][key] || key; }
@@ -346,20 +373,7 @@
   function buildLangDropdown(){ let dd=document.getElementById('langDropdown'); dd.innerHTML=''; Object.entries(languages).forEach(([code,l])=>{ let div=document.createElement('div'); div.className='lang-option'; div.innerHTML=`${l.flag} ${l.name}`; div.onclick=()=>{ currentLang=code; updateLanguage(); dd.style.display='none'; localStorage.setItem('bingo_lang',code); }; dd.appendChild(div); }); }
   buildLangDropdown(); updateLanguage();
 
-  // Universal fullscreen toggle for mobile
-  function toggleFullscreen() { 
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(e => console.log("Fullscreen error:", e));
-    } else {
-      document.exitFullscreen();
-    }
-  }
-  document.getElementById('headerFsPage1')?.addEventListener('click', toggleFullscreen);
-  document.getElementById('headerFsPage2')?.addEventListener('click', toggleFullscreen);
-  document.getElementById('headerFsPage3')?.addEventListener('click', toggleFullscreen);
-  document.getElementById('fullscreenToggle')?.addEventListener('click', toggleFullscreen);
-
-  // Core game data and logic (preserved original)
+  // ======================= CORE GAME DATA =======================
   let users = JSON.parse(localStorage.getItem('bingo_users') || '[]');
   let jackpotAmount = parseFloat(localStorage.getItem('jackpotAmount') || '0');
   let notifications = JSON.parse(localStorage.getItem('bingo_notifications') || '[]');
@@ -402,7 +416,7 @@
   document.getElementById('withdrawCallBtn').onclick = () => { if(!adminPermissions.withdrawEnabled){ showToast('Withdrawals disabled by admin'); return; } let amt = parseFloat(document.getElementById('withdrawAmount').value); if(!currentUser) return showToast('Login required'); let total = (currentUser.paidBalance||0)+(currentUser.wonBalance||0)+(currentUser.totalCommission||0)+(currentUser.rewardPoints||0)+(currentUser.jackpotHit||0); if(isNaN(amt) || amt<25) return showToast('Min 25 ETB'); if(amt>total) return showToast('Insufficient balance'); let msg = `🏦 WITHDRAW REQUEST\n👤 ${currentUser.name}\n📞 ${currentUser.phone}\n💰 ${amt} ETB\n💎 Reply with method (CBE/Telebirr) & account.\nDate: ${new Date().toLocaleDateString()}`; navigator.clipboard.writeText(msg); window.open('https://t.me/GOGSmore', '_blank'); addNotification(`Withdraw ${amt} requested`); };
   
   function showPlayersTable() { let p=users.filter(u=>u.type==='player'); let html=`<div class="compact-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Paid</th><th>Won</th><th>Commission</th><th>Reward</th><th>Jackpot</th><th>Withdraw</th><th>Total</th></tr></thead><tbody>${p.map(pl=>`<tr><td>${pl.name}</td><td>${pl.phone||''}</td><td>${(pl.paidBalance||0).toFixed(2)}</td><td>${(pl.wonBalance||0).toFixed(2)}</td><td>${(pl.totalCommission||0).toFixed(2)}</td><td>${(pl.rewardPoints||0).toFixed(2)}</td><td>${(pl.jackpotHit||0).toFixed(2)}</td><td>${(pl.totalWithdrawn||0).toFixed(2)}</td><td>${((pl.paidBalance||0)+(pl.wonBalance||0)+(pl.totalCommission||0)+(pl.rewardPoints||0)+(pl.jackpotHit||0)).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`; let m=document.createElement('div'); m.className='fullscreen-modal'; m.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>👥 Players</h3>${html}</div>`; document.body.appendChild(m); m.querySelector('.close-overlay').onclick=()=>m.remove(); }
-  function showAgentsTable() { let a=users.filter(u=>u.type==='agent'); let html=`<div class="compact-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Commission</th><th>Paid</th><th>Won</th><th>Reward</th><th>Jackpot</th><th>Withdraw</th><th>Total</th></tr></thead><tbody>${a.map(ag=>`<tr><td>${ag.name}</td><td>${ag.phone||'—'}</td><td>${(ag.totalCommission||0).toFixed(2)}</td><td>${(ag.paidBalance||0).toFixed(2)}</td><td>${(ag.wonBalance||0).toFixed(2)}</td><td>${(ag.rewardPoints||0).toFixed(2)}</td><td>${(ag.jackpotHit||0).toFixed(2)}</td><td>${(ag.totalWithdrawn||0).toFixed(2)}</td><td>${((ag.paidBalance||0)+(ag.wonBalance||0)+(ag.totalCommission||0)+(ag.rewardPoints||0)+(ag.jackpotHit||0)).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`; let m=document.createElement('div'); m.className='fullscreen-modal'; m.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>🤝 Agents</h3>${html}</div>`; document.body.appendChild(m); m.querySelector('.close-overlay').onclick=()=>m.remove(); }
+  function showAgentsTable() { let a=users.filter(u=>u.type==='agent'); let html=`<div class="compact-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Commission</th><th>Paid</th><th>Won</th><th>Reward</th><th>Jackpot</th><th>Withdraw</th><th>Total</th><tr></thead><tbody>${a.map(ag=>`<tr><td>${ag.name}</td><td>${ag.phone||'—'}</td><td>${(ag.totalCommission||0).toFixed(2)}</td><td>${(ag.paidBalance||0).toFixed(2)}</td><td>${(ag.wonBalance||0).toFixed(2)}</td><td>${(ag.rewardPoints||0).toFixed(2)}</td><td>${(ag.jackpotHit||0).toFixed(2)}</td><td>${(ag.totalWithdrawn||0).toFixed(2)}</td><td>${((ag.paidBalance||0)+(ag.wonBalance||0)+(ag.totalCommission||0)+(ag.rewardPoints||0)+(ag.jackpotHit||0)).toFixed(2)}</td></tr>`).join('')}</tbody><tr></div>`; let m=document.createElement('div'); m.className='fullscreen-modal'; m.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>🤝 Agents</h3>${html}</div>`; document.body.appendChild(m); m.querySelector('.close-overlay').onclick=()=>m.remove(); }
   document.getElementById('playersTableBtn').onclick = showPlayersTable;
   document.getElementById('agentsTableBtn').onclick = showAgentsTable;
   
@@ -425,6 +439,15 @@
   document.getElementById('langToggleBtn').onclick=(e)=>{ e.stopPropagation(); const dd=document.getElementById('langDropdown'); dd.style.display=dd.style.display==='none'?'block':'none'; };
   document.addEventListener('click',(e)=>{ if(!e.target.closest('#langToggleBtn')&&!e.target.closest('#langDropdown')) document.getElementById('langDropdown').style.display='none'; });
   
+  // DOOR BUTTON: proceed to next page (register)
+  document.getElementById('startAppBtn').onclick = () => { 
+    if(!currentUser) {
+      window.createUserFromRegister();
+    } else {
+      switchPage('page1');
+    }
+  };
+  
   window.handlePlayerPayment = (role) => { if(role==='player') { let msg = `💸 Payment Required!\nCBE: 1000062264911 or Telebirr: 0918203416\nAfter payment, send screenshot to t.me/GOGSmore`; alert(msg); window.open('https://t.me/GOGSmore', '_blank'); } };
   window.createUserFromRegister = () => {
     let name = document.getElementById('userName').value.trim() || 'Guest';
@@ -443,7 +466,6 @@
     addNotification(`${name} registered as ${role}`);
     switchPage('page1');
   };
-  document.getElementById('startAppBtn').onclick = () => { if(!currentUser) window.createUserFromRegister(); else switchPage('page1'); };
   if(!users.length) users.push({id:'admin1',name:'Admin',type:'admin'});
   saveData(); updateUI(); setInterval(updateUI, 1000);
 })();
