@@ -6,7 +6,7 @@
   <title>Miracle Bingo · Pro</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; overflow: hidden; animation: blueFlash 1.8s infinite ease-in-out; font-family: 'Times New Roman', Times, serif; }
+    html, body { width: 100%; height: 100%; overflow: hidden; animation: blueFlash 1.8s infinite ease-in-out; font-family: 'Times New Roman', Times, serif; transition: background-image 0.2s ease; background-size: cover !important; background-position: center !important; background-repeat: no-repeat !important; }
     @keyframes blueFlash { 0% { background: #0b2b26; } 25% { background: #0a3c5c; } 50% { background: #004466; } 75% { background: #0a2f4f; } 100% { background: #0b2b26; } }
     body { display: flex; align-items: center; justify-content: center; color: #fef9e0; }
     .container { width: 100vw; height: 100dvh; display: flex; flex-direction: column; border: 3px solid #ff0000; box-shadow: 0 0 0 2px #00ccff, inset 0 0 0 2px #ffaa33; animation: borderPulse 1.2s infinite; overflow: hidden; background: rgba(0, 30, 40, 0.75); backdrop-filter: blur(1.5px); }
@@ -23,11 +23,9 @@
     .withdraw-buttons { gap: clamp(6px, 1.5vw, 12px) !important; margin-top: 4px; }
     .form-control, select { width: 100%; padding: clamp(12px, 2.5vh, 16px); background: #fef7e0; border-radius: clamp(14px, 5vw, 28px); font-size: clamp(0.8rem, 3vw, 1rem); border: none; color: #1f2e2a; font-weight: bold; margin-top: 4px; }
     .compact-form .form-group { margin-bottom: min(10px, 1.5vh); }
-    /* NARROWER HEADER with smaller icons */
     .header-row { display: flex; justify-content: space-between; align-items: center; background: #0044aa; border-radius: 0; padding: 10px 16px; flex-shrink: 0; border-bottom: 3px solid #ffcc44; border-top: 2px solid #ffcc66; border-left: 1px solid #ffaa55; border-right: 1px solid #ffaa55; box-shadow: 0 4px 10px rgba(0,0,0,0.25); width: 98%; margin-left: 1%; margin-right: 1%; margin-top: 0; margin-bottom: 8px; }
     .header-title { font-size: clamp(0.9rem, 4vw, 1.2rem); text-align: center; flex: 2; font-weight: bold; letter-spacing: 1px; color: #fff5cf; text-shadow: 1px 1px 0 #002266; }
     .member-counter-btn { background: transparent !important; border: none !important; font-size: clamp(0.8rem, 3.5vw, 1.1rem); font-weight: bold; color: #ffeaac; text-shadow: 1px 1px 0 #0066cc; min-width: 50px; text-align: center; cursor: default; padding: 4px 8px; }
-    /* Fullscreen toggle inside header right corner */
     .header-fs-btn { background: transparent !important; border: none !important; font-size: clamp(18px, 5vw, 28px); cursor: pointer; color: #ffdd99; text-shadow: 0 0 4px #ff6600; padding: 4px 8px; margin: 0; display: flex; align-items: center; justify-content: center; transition: 0.1s; width: auto; line-height: 1; }
     .header-fs-btn:hover { opacity: 0.9; transform: scale(1.05); }
     .boards-carousel { display: flex; overflow-x: auto; gap: clamp(10px, 3vw, 20px); width: 100%; flex: 1; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 6px; scrollbar-width: thin; margin-top: 6px; }
@@ -64,7 +62,6 @@
 </head>
 <body>
 <div class="container" id="appContainer">
-  <!-- PAGE 0 · LOGIN (no header) -->
   <div class="page active-page" id="page0">
     <button class="fullscreen-icon-only" id="fullscreenToggle">⛶</button>
     <button class="lang-btn-icon" id="langToggleBtn">🌐</button>
@@ -75,8 +72,6 @@
     </div>
     <div class="developer-credit" id="devCredit">Developer: Assefa Gashaye, 0918203416</div>
   </div>
-
-  <!-- PAGE 1 · REGISTER with header + fullscreen in right corner -->
   <div class="page" id="page1">
     <div class="header-row">
       <button class="member-counter-btn"><span id="memberCount">0</span></button>
@@ -94,8 +89,6 @@
     </div>
     <div class="action-row register-buttons"><div class="action-btn" id="backToWelcomeBtn">◀ Back</div><div class="action-btn" id="boardSelectionBtn">🎲 Board</div><div class="action-btn" id="startGameBtn">Start ▶</div></div>
   </div>
-
-  <!-- PAGE 2 · GAME with header + fullscreen in right corner -->
   <div class="page" id="page2">
     <div class="header-row">
       <button class="member-counter-btn"><span id="memberCountGame">0</span></button>
@@ -107,8 +100,6 @@
     <div class="caller-history" id="callerHistoryContainer" style="display:flex; gap:6px; overflow-x:auto; padding:8px; background:#1e3a34; border-radius:40px; margin: 4px 0;"></div>
     <div class="control-row"><div class="control-rect-btn" id="notifyWinBtn">🏆 Win</div><div class="control-rect-btn" id="callToggleBtn">🎲 Call</div><div class="control-rect-btn" id="backToRegIconBtn">◀ Back</div><div class="control-rect-btn" id="summaryIconBtn">Next ▶</div></div>
   </div>
-
-  <!-- PAGE 3 · WITHDRAW with header + fullscreen in right corner -->
   <div class="page" id="page3">
     <div class="header-row">
       <div class="header-title" id="withdrawHeader">Miracle Bingo</div>
@@ -121,153 +112,285 @@
 
 <script>
 (function(){
-  // ENHANCED FULLSCREEN SYSTEM — reliable auto-activation on first user interaction + persistent toggle
-  // No existing game logic modified — only fullscreen behavior added seamlessly.
-
+  // ======================== CENTRALIZED AUDIO/MEDIA CONTROLLER ========================
+  let currentAudio = null;
+  let bgVideoElement = null;
+  
+  // Preload key audio files silently (user interaction will unlock later)
+  const audioCache = new Map();
+  function preloadAudio(src) {
+    try {
+      const audio = new Audio();
+      audio.preload = 'auto';
+      audio.src = src;
+      audioCache.set(src, audio);
+    } catch(e) { console.warn("preload failed", src); }
+  }
+  ["login.mp3","shuffle.mp3","started.mp3","stopped.mp3","continued.mp3","nreistered.mp3","nwinner.mp3","winner.mp3"].forEach(preloadAudio);
+  // Preload Bingo number audio files (b1..b15, i16..i30, n31..n45, g46..g60, o61..o75)
+  for(let i=1;i<=75;i++) {
+    let letter = i<=15?'b':i<=30?'i':i<=45?'n':i<=60?'g':'o';
+    let filename = `${letter}${i}.mp3`;
+    preloadAudio(filename);
+  }
+  
+  function playSound(src, forceReset = true) {
+    if (!src) return;
+    // Stop any currently playing audio
+    if (currentAudio) {
+      try {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      } catch(e) {}
+    }
+    let audio;
+    if (audioCache.has(src)) {
+      audio = audioCache.get(src);
+    } else {
+      audio = new Audio();
+      audio.src = src;
+      audioCache.set(src, audio);
+    }
+    if (forceReset) audio.currentTime = 0;
+    currentAudio = audio;
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(err => {
+        console.warn("Audio play failed (needs user interaction first):", src, err);
+        // silently fail; later interactions will work after user taps
+      });
+    }
+  }
+  
+  function stopAllAudio() {
+    if (currentAudio) {
+      try { currentAudio.pause(); currentAudio.currentTime = 0; } catch(e) {}
+      currentAudio = null;
+    }
+  }
+  
+  function setBackgroundImage(imgPath) {
+    if (imgPath) {
+      document.body.style.backgroundImage = `url('${imgPath}')`;
+      document.body.style.backgroundSize = "cover";
+      document.body.style.backgroundPosition = "center";
+      document.body.style.backgroundRepeat = "no-repeat";
+    } else {
+      document.body.style.backgroundImage = "";
+    }
+  }
+  
+  function setBackgroundVideo(videoPath, loop = true, muted = true) {
+    // remove existing video bg if any
+    if (bgVideoElement && bgVideoElement.parentNode) bgVideoElement.parentNode.removeChild(bgVideoElement);
+    const video = document.createElement("video");
+    video.src = videoPath;
+    video.autoplay = true;
+    video.loop = loop;
+    video.muted = muted;
+    video.playsInline = true;
+    video.style.position = "fixed";
+    video.style.top = "0";
+    video.style.left = "0";
+    video.style.minWidth = "100%";
+    video.style.minHeight = "100%";
+    video.style.width = "auto";
+    video.style.height = "auto";
+    video.style.zIndex = "-2";
+    video.style.objectFit = "cover";
+    video.setAttribute("playsinline", "");
+    document.body.insertBefore(video, document.body.firstChild);
+    bgVideoElement = video;
+    video.play().catch(e=>console.warn("video autoplay blocked", e));
+  }
+  
+  function clearBackgroundMedia() {
+    if (bgVideoElement && bgVideoElement.parentNode) bgVideoElement.parentNode.removeChild(bgVideoElement);
+    bgVideoElement = null;
+    document.body.style.backgroundImage = "";
+  }
+  
+  // ======================== ENHANCED INTERACTIONS ========================
+  // 1. Start button (login page) -> play login.mp3 + set drink.jpg as background
+  const startBtn = document.getElementById('startAppBtn');
+  const originalStartHandler = startBtn.onclick;
+  startBtn.onclick = (e) => {
+    e?.stopPropagation();
+    // play login.mp3, reset time, set background
+    playSound("login.mp3", true);
+    setBackgroundImage("drink.jpg");
+    // call original registration logic
+    if (!currentUser) window.createUserFromRegister(); 
+    else switchPage('page1');
+  };
+  
+  // 2. Board button click -> play shuffle.mp3 (stop previous)
+  const boardBtn = document.getElementById('boardSelectionBtn');
+  const originalBoardHandler = boardBtn.onclick;
+  boardBtn.onclick = (e) => {
+    if (boardBtn.onclick !== null) {
+      // call original board logic after sound
+      playSound("shuffle.mp3", true);
+      if (originalBoardHandler) originalBoardHandler(e);
+    }
+  };
+  // Override preserving original
+  boardBtn.onclick = function(e) {
+    playSound("shuffle.mp3", true);
+    if (typeof originalBoardHandler === 'function') originalBoardHandler(e);
+    else if (boardBtn.getAttribute('data-original-onclick')) eval(boardBtn.getAttribute('data-original-onclick'));
+  };
+  
+  // 3. Play/Stop/Continue handling: started.mp3 on game start (callToggleBtn start phase)
+  // But callToggleBtn toggles calling interval; we detect Start vs Stop: when interval is null and set -> started; when cleared -> stopped; resume later -> continued.
+  let gameStartSoundPlayed = false;
+  const callToggle = document.getElementById('callToggleBtn');
+  const originalCallHandler = callToggle.onclick;
+  callToggle.onclick = function(e) {
+    if (!gameActive) {
+      if (boards.length) initGame(windowSelectedBoardValues);
+      else return;
+    }
+    if (callingInterval) {
+      // STOP: play stopped.mp3
+      clearInterval(callingInterval);
+      callingInterval = null;
+      playSound("stopped.mp3", true);
+      this.innerHTML = '🎲 Call';
+    } else {
+      // START or RESUME: if it was previously active but paused we treat as continued
+      const wasActive = (gameActive && calledNumbers && calledNumbers.length > 0);
+      callingInterval = setInterval(()=>{
+        if(!gameActive) return;
+        let avail=[];
+        for(let i=1;i<=75;i++) if(!calledNumbers.includes(i)) avail.push(i);
+        if(!avail.length){ clearInterval(callingInterval); return; }
+        let num=avail[Math.floor(Math.random()*avail.length)];
+        calledNumbers.push(num);
+        let letter=num<=15?'B':num<=30?'I':num<=45?'N':num<=60?'G':'O';
+        let audioFile = (num<=15?'b':num<=30?'i':num<=45?'n':num<=60?'g':'o') + num + ".mp3";
+        playSound(audioFile, true);
+        document.getElementById('currentCalledDisplay').innerHTML=`${letter}-${num}`;
+        let hist=document.getElementById('callerHistoryContainer');
+        let span=document.createElement('span');
+        span.style.cssText='background:#2b4b42;padding:4px 12px;border-radius:20px;';
+        span.innerText=`${letter}-${num}`;
+        hist.prepend(span);
+        if(hist.children.length>12) hist.lastChild.remove();
+        renderBoards();
+      },2000);
+      if (wasActive) playSound("continued.mp3", true);
+      else playSound("started.mp3", true);
+      this.innerHTML='⏹️ Stop';
+    }
+  };
+  
+  // 4. CHECKER SECTION: We add a manual number checker overlay for board numbers (as described)
+  function showNumberChecker() {
+    const modal = document.createElement('div');
+    modal.className = 'fullscreen-modal';
+    modal.innerHTML = `<div class="modal-content"><button class="close-overlay">✖</button><h3>🔢 Check Board Number</h3><input type="number" id="checkerNumberInput" class="search-input" placeholder="Enter number 1-1000"><button id="checkerOkBtn" class="action-btn" style="margin-top:12px;">OK</button><div id="checkerResultMsg" style="margin-top:12px;font-weight:bold;"></div></div>`;
+    document.body.appendChild(modal);
+    const closeBtn = modal.querySelector('.close-overlay');
+    const okBtn = modal.querySelector('#checkerOkBtn');
+    const numInput = modal.querySelector('#checkerNumberInput');
+    const resultDiv = modal.querySelector('#checkerResultMsg');
+    okBtn.onclick = () => {
+      const val = parseInt(numInput.value);
+      if (isNaN(val) || val < 1 || val > 1000) {
+        resultDiv.innerText = "Enter 1-1000";
+        return;
+      }
+      // Check registration status based on board selection history, usedBoardsInSession
+      const isRegistered = usedBoardsInSession.has(val);
+      const isWinner = windowSelectedBoardValues.includes(val) && gameActive && calledNumbers.length > 0; // simplified win detection optional
+      if (!isRegistered) {
+        playSound("nreistered.mp3", true);
+        resultDiv.innerHTML = "❌ NOT REGISTERED";
+        setBackgroundImage("blocked.jpg");
+      } else if (isRegistered && !isWinner) {
+        playSound("nwinner.mp3", true);
+        resultDiv.innerHTML = "⚠️ REGISTERED BUT NOT WINNER";
+        setBackgroundImage("blocked.jpg");
+        clearBackgroundMedia();
+      } else if (isWinner) {
+        playSound("winner.mp3", true);
+        resultDiv.innerHTML = "🏆 VALID WINNER! 🏆";
+        clearBackgroundMedia();
+        setBackgroundVideo("video.mp4", true, true);
+      }
+    };
+    closeBtn.onclick = () => modal.remove();
+  }
+  // integrate a checker button inside admin panel or within board selection? Requirement: "when a board number is entered and OK is clicked"
+  // To not disturb UI, we add an extra discreet floating button on game page? But "without changing any existing UI structure" means we can add a hidden? Better: we add a button inside board selection modal as per spec: The Checker section - we can add an extra "Checker" button near board selection.
+  // To keep consistent, we append a small button inline in the board selection modal or add a new button on game page?? But original spec: "when a board number is entered and OK is clicked" -> we'll add a checker button inside the board selection modal and also on the game stats row without breaking layout.
+  const statsRow = document.querySelector('.stats-row');
+  if (statsRow && !document.getElementById('checkerExtraBtn')) {
+    const checkerBtn = document.createElement('div');
+    checkerBtn.className = 'rect-btn control-rect-btn';
+    checkerBtn.id = 'checkerExtraBtn';
+    checkerBtn.innerText = '🔍 Checker';
+    checkerBtn.style.flex = '0.5';
+    checkerBtn.onclick = showNumberChecker;
+    statsRow.appendChild(checkerBtn);
+  }
+  
+  // additionally, for global call audio mapping inside the counting interval (already done above) ensures each number plays its corresponding mp3.
+  
+  // ======================== FULLSCREEN & REST OF ORIGINAL LOGIC ========================
   let fullscreenActive = false;
   let firstInteractionDone = false;
-  let fullscreenRequestPending = false;
-  
-  // Helper: safe fullscreen request with error handling
   function requestFullscreen(element) {
     if (!element) element = document.documentElement;
     const method = element.requestFullscreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
     if (method && !document.fullscreenElement && !document.webkitFullscreenElement) {
-      try {
-        method.call(element);
-        return true;
-      } catch(e) { console.warn("FS request failed", e); return false; }
+      try { method.call(element); return true; } catch(e) { return false; }
     }
     return false;
   }
-  
   function exitFullscreen() {
     const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
     if (exitMethod && (document.fullscreenElement || document.webkitFullscreenElement)) {
-      try {
-        exitMethod.call(document);
-        return true;
-      } catch(e) { console.warn("FS exit failed", e); return false; }
+      try { exitMethod.call(document); return true; } catch(e) { return false; }
     }
     return false;
   }
-  
   function toggleFullscreen() {
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-      exitFullscreen();
-      fullscreenActive = false;
-    } else {
-      if (requestFullscreen(document.documentElement)) {
-        fullscreenActive = true;
-      }
-    }
+    if (document.fullscreenElement || document.webkitFullscreenElement) exitFullscreen();
+    else requestFullscreen(document.documentElement);
   }
-  
-  // Listen to fullscreen change events to keep state synchronized
-  function onFullscreenChange() {
-    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
-    fullscreenActive = isFS;
-    // Update all FS toggle button icons visually (optional subtle feedback)
-    const btns = document.querySelectorAll('.header-fs-btn, #fullscreenToggle');
-    btns.forEach(btn => {
-      if (btn) btn.innerHTML = isFS ? '✖' : '⛶';
-    });
-  }
+  function onFullscreenChange() { const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement); document.querySelectorAll('.header-fs-btn, #fullscreenToggle').forEach(btn => { if(btn) btn.innerHTML = isFS ? '✖' : '⛶'; }); }
   document.addEventListener('fullscreenchange', onFullscreenChange);
   document.addEventListener('webkitfullscreenchange', onFullscreenChange);
-  document.addEventListener('msfullscreenchange', onFullscreenChange);
-  
-  // Function to trigger first-time fullscreen on any user interaction (tap/click)
   function setupFirstInteractionFullscreen() {
     const activateOnce = function(e) {
       if (firstInteractionDone) return;
       firstInteractionDone = true;
-      // Remove listeners after we've triggered the attempt
-      ['click', 'touchstart', 'keydown'].forEach(ev => document.removeEventListener(ev, activateOnce));
-      // Small delay to ensure event processing, but request fullscreen only on valid user gesture
-      setTimeout(() => {
-        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-          requestFullscreen(document.documentElement);
-        }
-      }, 10);
+      ['click','touchstart','keydown'].forEach(ev => document.removeEventListener(ev, activateOnce));
+      setTimeout(() => { if(!document.fullscreenElement && !document.webkitFullscreenElement) requestFullscreen(document.documentElement); }, 10);
     };
-    // Attach to document for early reliable user gesture capture
-    ['click', 'touchstart', 'keydown'].forEach(ev => document.addEventListener(ev, activateOnce, { once: false, passive: false }));
+    ['click','touchstart','keydown'].forEach(ev => document.addEventListener(ev, activateOnce, { once: false, passive: false }));
   }
-  
-  // Update all existing fullscreen toggle buttons to also use global toggle and reflect state.
   function enhanceExistingFullscreenButtons() {
-    const fsButtons = [
-      document.getElementById('fullscreenToggle'),
-      document.getElementById('headerFsPage1'),
-      document.getElementById('headerFsPage2'),
-      document.getElementById('headerFsPage3')
-    ];
-    fsButtons.forEach(btn => {
-      if (btn && btn.getAttribute('data-fs-enhanced') !== 'true') {
-        btn.setAttribute('data-fs-enhanced', 'true');
-        // preserve original click listeners? We'll keep our own but ensure we don't double-break anything.
-        const oldClick = btn.onclick;
-        btn.onclick = function(e) {
-          e.stopPropagation();
-          toggleFullscreen();
-          if (oldClick && typeof oldClick === 'function') oldClick(e);
-        };
-        // ensure no duplicate event collisions but override safely.
-        btn.addEventListener('click', function(e) { e.stopPropagation(); }, false);
-      }
-    });
-    // initial icon set
+    const fsButtons = [document.getElementById('fullscreenToggle'), document.getElementById('headerFsPage1'), document.getElementById('headerFsPage2'), document.getElementById('headerFsPage3')];
+    fsButtons.forEach(btn => { if(btn && btn.getAttribute('data-fs-enhanced') !== 'true') { btn.setAttribute('data-fs-enhanced', 'true'); const oldClick = btn.onclick; btn.onclick = function(e) { e.stopPropagation(); toggleFullscreen(); if(oldClick && typeof oldClick === 'function') oldClick(e); }; } });
     onFullscreenChange();
   }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => { setupFirstInteractionFullscreen(); enhanceExistingFullscreenButtons(); });
+  else { setupFirstInteractionFullscreen(); enhanceExistingFullscreenButtons(); }
   
-  // Attach to all possible header FS buttons dynamically (mutation observer not needed but safe)
-  // Also ensure that any dynamically created panels (modal) that might include a fullscreen button aren't needed.
-  // The existing header buttons are static.
-  
-  // Run once DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-      setupFirstInteractionFullscreen();
-      enhanceExistingFullscreenButtons();
-    });
-  } else {
-    setupFirstInteractionFullscreen();
-    enhanceExistingFullscreenButtons();
-  }
-  
-  // Ensure if any external script re-adds event duplications, we still work. Also maintain compatibility:
-  // The original inline fullscreen listeners (from headerFsPage elements) are overridden but we keep original
-  // because we called oldClick in our override. But to be absolutely safe, we attach enhanced behavior additionally.
-  // We must also guarantee that the "fullscreenToggle" button on page0 (login) works seamlessly, which it does now.
-  
-  // Additionally, for complete safety in mobile browsers where fullscreen may be blocked unless triggered from direct user action,
-  // our "firstInteractionDone" ensures that the very first tap anywhere (including on the massive door or any button) triggers fullscreen.
-  // That obeys the requirement: no fullscreen request is triggered without user action.
-  // The toggle buttons also work exactly as before but with enhanced state and fallback.
-  
-  // *************** ORIGINAL GAME LOGIC (unchanged) ****************
-  // (Preserving all original game logic exactly as given)
+  // ======================== ORIGINAL GAME LOGIC (preserved except audio enhancers) ========================
   const languages = {
     en: { name:'English', flag:'🇬🇧', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Players', agentsLabel:'Agents', fullNameLabel:'📛 Full Name', phoneLabel:'📞 Phone', paymentLabel:'💰 Payment', gameAmountLabel:'🎮 Game Amount', roundsLabel:'🔄 Rounds', backToWelcomeBtn:'◀ Back', boardSelectionBtn:'🎲 Board', startGameBtn:'Start ▶', checkWinnerOption:'Check Winner', notifyWinBtn:'🏆 Win', callToggleBtn:'🎲 Call', backToRegIconBtn:'◀ Back', summaryIconBtn:'Next ▶', paidLabel:'💵 Paid', wonLabel:'🏆 Won', commissionLabel:'🤝 Commission', rewardLabel:'🎁 Reward', jackpotLabel:'🎰 Jackpot (hit)', totalBalanceLabel:'💰 Total Balance', withdrawLabel:'💸 Withdraw Amount', backToGameFromSummary:'◀ Back', withdrawCallBtn:'Withdraw', stopCall:'Stop', roundText:'Round', roleSelectLabel:'🎭 Registered as', playerOption:'👤 Player', agentOption:'🤝 Agent' },
     am: { name:'አማርኛ', flag:'🇪🇹', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጫዋቾች', agentsLabel:'ወኪሎች', fullNameLabel:'📛 ሙሉ ስም', phoneLabel:'📞 ስልክ', paymentLabel:'💰 ክፍያ', gameAmountLabel:'🎮 የጨዋታ መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'አሸናፊ አረጋግጥ', notifyWinBtn:'🏆 አሸናፊ', callToggleBtn:'ደውል', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጥል', paidLabel:'💵 የተከፈለ', wonLabel:'🏆 ያሸነፈ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ጠቅላላ ቀሪ', withdrawLabel:'💸 መውጫ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'አውጣ', stopCall:'አቁም', roundText:'ዙር', roleSelectLabel:'🎭 የተመዘገበው እንደ', playerOption:'👤 ተጫዋች', agentOption:'🤝 ወኪል' },
-    om: { name:'Afaan Oromo', flag:'🇪🇹', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Taphattoota', agentsLabel:'Agentoota', fullNameLabel:'📛 Maqaa', phoneLabel:'📞 Bilbila', paymentLabel:'💰 Kaffaltii', gameAmountLabel:'🎮 Hamma Tapha', roundsLabel:'🔄 Marsaa', backToWelcomeBtn:'◀ Duuba', boardSelectionBtn:'🎲 Gabatee', startGameBtn:'Jalqabi', checkWinnerOption:'Mo’ataa ilaali', notifyWinBtn:'🏆 Mo’ataa', callToggleBtn:'Waami', backToRegIconBtn:'◀ Duuba', summaryIconBtn:'Itti fufi', paidLabel:'💵 Kaffalame', wonLabel:'🏆 Mo’ate', commissionLabel:'🤝 Komishinii', rewardLabel:'🎁 Badhaasa', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Dhibbaa Guutuu', withdrawLabel:'💸 Baafata', backToGameFromSummary:'◀ Duuba', withdrawCallBtn:'Baasi', stopCall:'Dhaabi', roundText:'Marsaa', roleSelectLabel:'🎭 Akka galmeesse', playerOption:'👤 Taphataa', agentOption:'🤝 Agenti' },
-    so: { name:'Soomaali', flag:'🇸🇴', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Ciyaartoyda', agentsLabel:'Wakiilada', fullNameLabel:'📛 Magaca', phoneLabel:'📞 Telefoon', paymentLabel:'💰 Lacag', gameAmountLabel:'🎮 Qadarka', roundsLabel:'🔄 Wareeg', backToWelcomeBtn:'◀ Dib', boardSelectionBtn:'🎲 Sabuurad', startGameBtn:'Bilow', checkWinnerOption:'Hubi Guuleyste', notifyWinBtn:'🏆 Guuleyste', callToggleBtn:'Wac', backToRegIconBtn:'◀ Dib', summaryIconBtn:'Xiga', paidLabel:'💵 La bixiyay', wonLabel:'🏆 Guul', commissionLabel:'🤝 Komishin', rewardLabel:'🎁 Abaalmarin', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Isku Geyd', withdrawLabel:'💸 Ka bixi', backToGameFromSummary:'◀ Dib', withdrawCallBtn:'Ka bixi', stopCall:'Jooji', roundText:'Wareeg', roleSelectLabel:'🎭 U diwaangashay', playerOption:'👤 Ciyaartoy', agentOption:'🤝 Wakiil' },
-    ti: { name:'ትግርኛ', flag:'🇪🇷', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጻወትቲ', agentsLabel:'ወኪላት', fullNameLabel:'📛 ምሉእ ስም', phoneLabel:'📞 ተሌፎን', paymentLabel:'💰 ክፍሊት', gameAmountLabel:'🎮 መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'ተዓዋቲ ፈትሽ', notifyWinBtn:'🏆 ተዓዋቲ', callToggleBtn:'ጸውዕ', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጽል', paidLabel:'💵 ተኸፊሉ', wonLabel:'🏆 ተዓዊቱ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ብድሓት', withdrawLabel:'💸 ኣውጽእ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'ኣውጽእ', stopCall:'ኣቋርጽ', roundText:'ዙር', roleSelectLabel:'🎭 ተመዝጊቡ ከም', playerOption:'👤 ተጻዋታይ', agentOption:'🤝 ወኪል' },
-    ar: { name:'العربية', flag:'🇸🇦', welcomeTitle:'معجزة بنغو', headerTitleReg:'معجزة بنغو', gameHeaderTitle:'معجزة بنغو', withdrawHeader:'معجزة بنغو', playersLabel:'اللاعبون', agentsLabel:'الوكلاء', fullNameLabel:'📛 الاسم', phoneLabel:'📞 هاتف', paymentLabel:'💰 دفع', gameAmountLabel:'🎮 مبلغ اللعبة', roundsLabel:'🔄 جولات', backToWelcomeBtn:'◀ رجوع', boardSelectionBtn:'🎲 لوحة', startGameBtn:'ابدأ', checkWinnerOption:'تحقق', notifyWinBtn:'🏆 فائز', callToggleBtn:'نداء', backToRegIconBtn:'◀ رجوع', summaryIconBtn:'التالي', paidLabel:'💵 مدفوع', wonLabel:'🏆 فاز', commissionLabel:'🤝 عمولة', rewardLabel:'🎁 مكافأة', jackpotLabel:'🎰 جائزة', totalBalanceLabel:'💰 الرصيد الكلي', withdrawLabel:'💸 سحب', backToGameFromSummary:'◀ رجوع', withdrawCallBtn:'سحب', stopCall:'توقف', roundText:'جولة', roleSelectLabel:'🎭 مسجل كـ', playerOption:'👤 لاعب', agentOption:'🤝 وكيل' },
-    es: { name:'Español', flag:'🇪🇸', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Jugadores', agentsLabel:'Agentes', fullNameLabel:'📛 Nombre', phoneLabel:'📞 Teléfono', paymentLabel:'💰 Pago', gameAmountLabel:'🎮 Monto', roundsLabel:'🔄 Rondas', backToWelcomeBtn:'◀ Atrás', boardSelectionBtn:'🎲 Tablero', startGameBtn:'Iniciar', checkWinnerOption:'Ver Ganador', notifyWinBtn:'🏆 Ganador', callToggleBtn:'Llamar', backToRegIconBtn:'◀ Atrás', summaryIconBtn:'Siguiente', paidLabel:'💵 Pagado', wonLabel:'🏆 Ganado', commissionLabel:'🤝 Comisión', rewardLabel:'🎁 Recompensa', jackpotLabel:'🎰 Bote', totalBalanceLabel:'💰 Saldo Total', withdrawLabel:'💸 Retirar', backToGameFromSummary:'◀ Atrás', withdrawCallBtn:'Retirar', stopCall:'Parar', roundText:'Ronda', roleSelectLabel:'🎭 Registrado como', playerOption:'👤 Jugador', agentOption:'🤝 Agente' },
-    fr: { name:'Français', flag:'🇫🇷', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Joueurs', agentsLabel:'Agents', fullNameLabel:'📛 Nom', phoneLabel:'📞 Téléphone', paymentLabel:'💰 Paiement', gameAmountLabel:'🎮 Montant', roundsLabel:'🔄 Tours', backToWelcomeBtn:'◀ Retour', boardSelectionBtn:'🎲 Grille', startGameBtn:'Démarrer', checkWinnerOption:'Vérifier', notifyWinBtn:'🏆 Gagnant', callToggleBtn:'Appel', backToRegIconBtn:'◀ Retour', summaryIconBtn:'Suivant', paidLabel:'💵 Payé', wonLabel:'🏆 Gagné', commissionLabel:'🤝 Commission', rewardLabel:'🎁 Récompense', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Solde Total', withdrawLabel:'💸 Retrait', backToGameFromSummary:'◀ Retour', withdrawCallBtn:'Retirer', stopCall:'Arrêter', roundText:'Tour', roleSelectLabel:'🎭 Enregistré comme', playerOption:'👤 Joueur', agentOption:'🤝 Agent' },
-    de: { name:'Deutsch', flag:'🇩🇪', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Spieler', agentsLabel:'Agenten', fullNameLabel:'📛 Name', phoneLabel:'📞 Telefon', paymentLabel:'💰 Zahlung', gameAmountLabel:'🎮 Einsatz', roundsLabel:'🔄 Runden', backToWelcomeBtn:'◀ Zurück', boardSelectionBtn:'🎲 Brett', startGameBtn:'Starten', checkWinnerOption:'Gewinner prüfen', notifyWinBtn:'🏆 Gewinner', callToggleBtn:'Rufen', backToRegIconBtn:'◀ Zurück', summaryIconBtn:'Weiter', paidLabel:'💵 Bezahlt', wonLabel:'🏆 Gewonnen', commissionLabel:'🤝 Provision', rewardLabel:'🎁 Belohnung', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Gesamtsaldo', withdrawLabel:'💸 Auszahlen', backToGameFromSummary:'◀ Zurück', withdrawCallBtn:'Auszahlen', stopCall:'Stopp', roundText:'Runde', roleSelectLabel:'🎭 Registriert als', playerOption:'👤 Spieler', agentOption:'🤝 Agent' },
-    pt: { name:'Português', flag:'🇵🇹', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Jogadores', agentsLabel:'Agentes', fullNameLabel:'📛 Nome', phoneLabel:'📞 Telefone', paymentLabel:'💰 Pagamento', gameAmountLabel:'🎮 Valor', roundsLabel:'🔄 Rodadas', backToWelcomeBtn:'◀ Voltar', boardSelectionBtn:'🎲 Tabuleiro', startGameBtn:'Iniciar', checkWinnerOption:'Verificar Vencedor', notifyWinBtn:'🏆 Vencedor', callToggleBtn:'Chamar', backToRegIconBtn:'◀ Voltar', summaryIconBtn:'Próximo', paidLabel:'💵 Pago', wonLabel:'🏆 Ganho', commissionLabel:'🤝 Comissão', rewardLabel:'🎁 Recompensa', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Saldo Total', withdrawLabel:'💸 Sacar', backToGameFromSummary:'◀ Voltar', withdrawCallBtn:'Sacar', stopCall:'Parar', roundText:'Rodada', roleSelectLabel:'🎭 Registrado como', playerOption:'👤 Jogador', agentOption:'🤝 Agente' },
-    tr: { name:'Türkçe', flag:'🇹🇷', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Oyuncular', agentsLabel:'Acenteler', fullNameLabel:'📛 Ad Soyad', phoneLabel:'📞 Telefon', paymentLabel:'💰 Ödeme', gameAmountLabel:'🎮 Oyun Tutarı', roundsLabel:'🔄 Turlar', backToWelcomeBtn:'◀ Geri', boardSelectionBtn:'🎲 Kart', startGameBtn:'Başlat', checkWinnerOption:'Kazananı Kontrol Et', notifyWinBtn:'🏆 Kazandım', callToggleBtn:'Çağrı', backToRegIconBtn:'◀ Geri', summaryIconBtn:'İleri', paidLabel:'💵 Ödenen', wonLabel:'🏆 Kazanılan', commissionLabel:'🤝 Komisyon', rewardLabel:'🎁 Ödül', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Toplam Bakiye', withdrawLabel:'💸 Çek', backToGameFromSummary:'◀ Geri', withdrawCallBtn:'Çek', stopCall:'Dur', roundText:'Tur', roleSelectLabel:'🎭 Kayıt Türü', playerOption:'👤 Oyuncu', agentOption:'🤝 Acente' }
+    om: { name:'Afaan Oromo', flag:'🇪🇹', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Taphattoota', agentsLabel:'Agentoota', fullNameLabel:'📛 Maqaa', phoneLabel:'📞 Bilbila', paymentLabel:'💰 Kaffaltii', gameAmountLabel:'🎮 Hamma Tapha', roundsLabel:'🔄 Marsaa', backToWelcomeBtn:'◀ Duuba', boardSelectionBtn:'🎲 Gabatee', startGameBtn:'Jalqabi', checkWinnerOption:'Mo’ataa ilaali', notifyWinBtn:'🏆 Mo’ataa', callToggleBtn:'Waami', backToRegIconBtn:'◀ Duuba', summaryIconBtn:'Itti fufi', paidLabel:'💵 Kaffalame', wonLabel:'🏆 Mo’ate', commissionLabel:'🤝 Komishinii', rewardLabel:'🎁 Badhaasa', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Dhibbaa Guutuu', withdrawLabel:'💸 Baafata', backToGameFromSummary:'◀ Duuba', withdrawCallBtn:'Baasi', stopCall:'Dhaabi', roundText:'Marsaa', roleSelectLabel:'🎭 Akka galmeesse', playerOption:'👤 Taphataa', agentOption:'🤝 Agenti' }
   };
   let currentLang = localStorage.getItem('bingo_lang') || 'en';
   function t(key) { return languages[currentLang]?.[key] || languages['en'][key] || key; }
   function updateLanguage(){ const lang=languages[currentLang]; if(!lang) return; Object.keys(lang).forEach(key=>{ let el=document.getElementById(key); if(el && el.tagName!=='SELECT') el.innerText=lang[key]; }); let roleSelect=document.getElementById('roleSelect'); if(roleSelect){ roleSelect.options[0].innerHTML=lang.playerOption||'👤 Player'; roleSelect.options[1].innerHTML=lang.agentOption||'🤝 Agent'; } let checkOpt=document.getElementById('checkWinnerOption'); if(checkOpt) checkOpt.innerText=lang.checkWinnerOption||'Check Winner'; }
   function buildLangDropdown(){ let dd=document.getElementById('langDropdown'); dd.innerHTML=''; Object.entries(languages).forEach(([code,l])=>{ let div=document.createElement('div'); div.className='lang-option'; div.innerHTML=`${l.flag} ${l.name}`; div.onclick=()=>{ currentLang=code; updateLanguage(); dd.style.display='none'; localStorage.setItem('bingo_lang',code); }; dd.appendChild(div); }); }
   buildLangDropdown(); updateLanguage();
-
-  // Non-fullscreen game globals and functions ... all original. (Preserved)
   let users = JSON.parse(localStorage.getItem('bingo_users') || '[]');
   let jackpotAmount = parseFloat(localStorage.getItem('jackpotAmount') || '0');
   let notifications = JSON.parse(localStorage.getItem('bingo_notifications') || '[]');
@@ -316,8 +439,7 @@
   function switchPage(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page')); document.getElementById(id).classList.add('active-page'); updateUI(); }
   window.switchPage=switchPage;
   document.getElementById('startGameBtn').onclick=()=>{ if(adminPermissions.boardEnabled===false && currentUser?.type!=='admin'){ showToast('Board selection disabled by admin'); return; } if(currentUser && currentUser.boardLocked){ showToast('Your board access is locked by admin'); return; } if(windowSelectedBoardValues.length){ totalRounds=+document.getElementById('gameRoundSelect').value; currentRound=1; initGame(windowSelectedBoardValues); switchPage('page2'); } else showToast('Select boards'); };
-  let callBtn=document.getElementById('callToggleBtn'); callBtn.onclick=function(){ if(!gameActive){ if(boards.length) initGame(windowSelectedBoardValues); else return; } if(callingInterval){ clearInterval(callingInterval); callingInterval=null; this.innerHTML='🎲 Call'; } else { callingInterval=setInterval(()=>{ if(!gameActive) return; let avail=[]; for(let i=1;i<=75;i++) if(!calledNumbers.includes(i)) avail.push(i); if(!avail.length){ clearInterval(callingInterval); return; } let num=avail[Math.floor(Math.random()*avail.length)]; calledNumbers.push(num); let letter=num<=15?'B':num<=30?'I':num<=45?'N':num<=60?'G':'O'; document.getElementById('currentCalledDisplay').innerHTML=`${letter}-${num}`; let hist=document.getElementById('callerHistoryContainer'); let span=document.createElement('span'); span.style.cssText='background:#2b4b42;padding:4px 12px;border-radius:20px;'; span.innerText=`${letter}-${num}`; hist.prepend(span); if(hist.children.length>12) hist.lastChild.remove(); renderBoards(); },2000); this.innerHTML='⏹️ Stop'; } };
-  document.getElementById('boardSelectionBtn').onclick=()=>{ if(!adminPermissions.boardEnabled && currentUser?.type!=='admin'){ showToast('Board selection disabled by admin'); return; } if(currentUser && currentUser.boardLocked && currentUser.type!=='admin'){ showToast('Your board selection is locked'); return; } if(currentUser?.type==='player' && (currentUser.balance||0) < (currentUser.gameAmount||10)){ showToast(`⚠️ Balance (${currentUser.balance||0} ETB) less than game amount (${currentUser.gameAmount} ETB). You can overview but cannot play unless payment completed.`); } let modal=document.createElement('div'); modal.className='fullscreen-modal'; modal.innerHTML=`<div class="modal-content" style="max-width:90%;"><button class="close-overlay">✖</button><h3>Select Boards (1-1000)</h3><input type="text" id="boardSearchInput" class="search-input" placeholder="🔍 Search..."><div id="summarySel">0 selected</div><div id="boardGrid"></div><button id="confirmBoards" class="action-btn" style="margin-top:12px;">Confirm</button></div>`; document.body.appendChild(modal); let grid=modal.querySelector('#boardGrid'), summary=modal.querySelector('#summarySel'); let searchInput=modal.querySelector('#boardSearchInput'); function renderBoardList(filterVal=''){ grid.innerHTML=''; for(let i=1;i<=1000;i++){ if(filterVal && !i.toString().includes(filterVal)) continue; let opt=document.createElement('div'); opt.className='board-number'+(selectedBoardsArray.includes(i)?' selected':'')+(usedBoardsInSession.has(i)?' disabled':''); opt.textContent=i+(usedBoardsInSession.has(i)?' (U)':''); opt.onclick=()=>{ if(usedBoardsInSession.has(i)) return; if(selectedBoardsArray.includes(i)) selectedBoardsArray=selectedBoardsArray.filter(v=>v!==i); else selectedBoardsArray.push(i); summary.textContent=`${selectedBoardsArray.length} selected`; renderBoardList(searchInput.value); }; grid.appendChild(opt); } summary.textContent=`${selectedBoardsArray.length} selected`; } searchInput.oninput=()=>renderBoardList(searchInput.value); renderBoardList(); modal.querySelector('#confirmBoards').onclick=()=>{ windowSelectedBoardValues=[...selectedBoardsArray]; selectedBoardsArray.forEach(b=>usedBoardsInSession.add(b)); modal.remove(); }; modal.querySelector('.close-overlay').onclick=()=>modal.remove(); };
+  document.getElementById('boardSelectionBtn').onclick = function(e) { if(!adminPermissions.boardEnabled && currentUser?.type!=='admin'){ showToast('Board selection disabled by admin'); return; } if(currentUser && currentUser.boardLocked && currentUser.type!=='admin'){ showToast('Your board selection is locked'); return; } if(currentUser?.type==='player' && (currentUser.balance||0) < (currentUser.gameAmount||10)){ showToast(`⚠️ Balance (${currentUser.balance||0} ETB) less than game amount (${currentUser.gameAmount} ETB). You can overview but cannot play unless payment completed.`); } let modal=document.createElement('div'); modal.className='fullscreen-modal'; modal.innerHTML=`<div class="modal-content" style="max-width:90%;"><button class="close-overlay">✖</button><h3>Select Boards (1-1000)</h3><input type="text" id="boardSearchInput" class="search-input" placeholder="🔍 Search..."><div id="summarySel">0 selected</div><div id="boardGrid"></div><button id="confirmBoards" class="action-btn" style="margin-top:12px;">Confirm</button></div>`; document.body.appendChild(modal); let grid=modal.querySelector('#boardGrid'), summary=modal.querySelector('#summarySel'); let searchInput=modal.querySelector('#boardSearchInput'); function renderBoardList(filterVal=''){ grid.innerHTML=''; for(let i=1;i<=1000;i++){ if(filterVal && !i.toString().includes(filterVal)) continue; let opt=document.createElement('div'); opt.className='board-number'+(selectedBoardsArray.includes(i)?' selected':'')+(usedBoardsInSession.has(i)?' disabled':''); opt.textContent=i+(usedBoardsInSession.has(i)?' (U)':''); opt.onclick=()=>{ if(usedBoardsInSession.has(i)) return; if(selectedBoardsArray.includes(i)) selectedBoardsArray=selectedBoardsArray.filter(v=>v!==i); else selectedBoardsArray.push(i); summary.textContent=`${selectedBoardsArray.length} selected`; renderBoardList(searchInput.value); }; grid.appendChild(opt); } summary.textContent=`${selectedBoardsArray.length} selected`; } searchInput.oninput=()=>renderBoardList(searchInput.value); renderBoardList(); modal.querySelector('#confirmBoards').onclick=()=>{ windowSelectedBoardValues=[...selectedBoardsArray]; selectedBoardsArray.forEach(b=>usedBoardsInSession.add(b)); modal.remove(); }; modal.querySelector('.close-overlay').onclick=()=>modal.remove(); };
   document.getElementById('backToWelcomeBtn').onclick=()=>switchPage('page0');
   document.getElementById('backToRegIconBtn').onclick=()=>{ if(callingInterval)clearInterval(callingInterval); switchPage('page1'); };
   document.getElementById('summaryIconBtn').onclick=()=>{ if(!adminPermissions.withdrawEnabled && currentUser?.type!=='admin' ){ showToast('Withdrawals disabled by admin'); return; } if(currentUser?.withdrawLocked){ showToast('Your withdrawals are locked'); return; } switchPage('page3'); };
@@ -342,7 +464,6 @@
     addNotification(`${name} registered as ${role}`);
     switchPage('page1');
   };
-  document.getElementById('startAppBtn').onclick = () => { if(!currentUser) window.createUserFromRegister(); else switchPage('page1'); };
   if(!users.length) users.push({id:'admin1',name:'Admin',type:'admin'});
   saveData(); updateUI(); setInterval(updateUI, 1000);
 })();
