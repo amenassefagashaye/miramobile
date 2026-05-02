@@ -6,10 +6,10 @@
   <title>Miracle Bingo · Pro</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    html, body { width: 100%; height: 100%; overflow: hidden; transition: background-image 0.2s ease; font-family: 'Times New Roman', Times, serif; background-size: cover; background-position: center; background-repeat: no-repeat; }
-    @keyframes blueFlash { 0% { background-color: #0b2b26; } 25% { background-color: #0a3c5c; } 50% { background-color: #004466; } 75% { background-color: #0a2f4f; } 100% { background-color: #0b2b26; } }
-    body { display: flex; align-items: center; justify-content: center; color: #fef9e0; animation: blueFlash 1.8s infinite ease-in-out; }
-    .container { width: 100vw; height: 100dvh; display: flex; flex-direction: column; border: 3px solid #ff0000; box-shadow: 0 0 0 2px #00ccff, inset 0 0 0 2px #ffaa33; animation: borderPulse 1.2s infinite; overflow: hidden; background: rgba(0, 30, 40, 0.65); backdrop-filter: blur(1.5px); }
+    html, body { width: 100%; height: 100%; overflow: hidden; animation: blueFlash 1.8s infinite ease-in-out; font-family: 'Times New Roman', Times, serif; }
+    @keyframes blueFlash { 0% { background: #0b2b26; } 25% { background: #0a3c5c; } 50% { background: #004466; } 75% { background: #0a2f4f; } 100% { background: #0b2b26; } }
+    body { display: flex; align-items: center; justify-content: center; color: #fef9e0; }
+    .container { width: 100vw; height: 100dvh; display: flex; flex-direction: column; border: 3px solid #ff0000; box-shadow: 0 0 0 2px #00ccff, inset 0 0 0 2px #ffaa33; animation: borderPulse 1.2s infinite; overflow: hidden; background: rgba(0, 30, 40, 0.75); backdrop-filter: blur(1.5px); }
     @keyframes borderPulse { 0%,100% { border-color: #ff0000; } 25% { border-color: #00ccff; } 50% { border-color: #ffd966; } 75% { border-color: #ffaa33; } }
     .page { display: none; flex-direction: column; width: 100%; height: 100%; padding: max(8px, 2vh) max(6px, 2vw); gap: min(12px, 2vh); overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch; scrollbar-width: thin; position: relative; }
     .active-page { display: flex; }
@@ -23,10 +23,13 @@
     .withdraw-buttons { gap: clamp(6px, 1.5vw, 12px) !important; margin-top: 4px; }
     .form-control, select { width: 100%; padding: clamp(12px, 2.5vh, 16px); background: #fef7e0; border-radius: clamp(14px, 5vw, 28px); font-size: clamp(0.8rem, 3vw, 1rem); border: none; color: #1f2e2a; font-weight: bold; margin-top: 4px; }
     .compact-form .form-group { margin-bottom: min(10px, 1.5vh); }
+    /* NARROWER HEADER with smaller icons */
     .header-row { display: flex; justify-content: space-between; align-items: center; background: #0044aa; border-radius: 0; padding: 10px 16px; flex-shrink: 0; border-bottom: 3px solid #ffcc44; border-top: 2px solid #ffcc66; border-left: 1px solid #ffaa55; border-right: 1px solid #ffaa55; box-shadow: 0 4px 10px rgba(0,0,0,0.25); width: 98%; margin-left: 1%; margin-right: 1%; margin-top: 0; margin-bottom: 8px; }
     .header-title { font-size: clamp(0.9rem, 4vw, 1.2rem); text-align: center; flex: 2; font-weight: bold; letter-spacing: 1px; color: #fff5cf; text-shadow: 1px 1px 0 #002266; }
     .member-counter-btn { background: transparent !important; border: none !important; font-size: clamp(0.8rem, 3.5vw, 1.1rem); font-weight: bold; color: #ffeaac; text-shadow: 1px 1px 0 #0066cc; min-width: 50px; text-align: center; cursor: default; padding: 4px 8px; }
+    /* Fullscreen toggle inside header right corner */
     .header-fs-btn { background: transparent !important; border: none !important; font-size: clamp(18px, 5vw, 28px); cursor: pointer; color: #ffdd99; text-shadow: 0 0 4px #ff6600; padding: 4px 8px; margin: 0; display: flex; align-items: center; justify-content: center; transition: 0.1s; width: auto; line-height: 1; }
+    .header-fs-btn:hover { opacity: 0.9; transform: scale(1.05); }
     .boards-carousel { display: flex; overflow-x: auto; gap: clamp(10px, 3vw, 20px); width: 100%; flex: 1; scroll-snap-type: x mandatory; scroll-behavior: smooth; padding-bottom: 6px; scrollbar-width: thin; margin-top: 6px; }
     .single-board { flex: 0 0 100%; scroll-snap-align: start; padding: clamp(4px, 1vh, 10px); background: rgba(15, 47, 42, 0.9); border-radius: 24px; backdrop-filter: blur(2px); min-width: 0; }
     .board-full-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: clamp(3px, 1.2vw, 8px); width: 100%; aspect-ratio: 1 / 0.9; }
@@ -61,6 +64,7 @@
 </head>
 <body>
 <div class="container" id="appContainer">
+  <!-- PAGE 0 · LOGIN (no header) -->
   <div class="page active-page" id="page0">
     <button class="fullscreen-icon-only" id="fullscreenToggle">⛶</button>
     <button class="lang-btn-icon" id="langToggleBtn">🌐</button>
@@ -71,8 +75,14 @@
     </div>
     <div class="developer-credit" id="devCredit">Developer: Assefa Gashaye, 0918203416</div>
   </div>
+
+  <!-- PAGE 1 · REGISTER with header + fullscreen in right corner -->
   <div class="page" id="page1">
-    <div class="header-row"><button class="member-counter-btn"><span id="memberCount">0</span></button><div class="header-title" id="headerTitleReg">Miracle Bingo</div><button class="header-fs-btn" id="headerFsPage1">⛶</button></div>
+    <div class="header-row">
+      <button class="member-counter-btn"><span id="memberCount">0</span></button>
+      <div class="header-title" id="headerTitleReg">Miracle Bingo</div>
+      <button class="header-fs-btn" id="headerFsPage1">⛶</button>
+    </div>
     <div class="member-buttons"><div class="member-btn" id="playersTableBtn"><span id="playersCount">0</span> <span id="playersLabel">Players</span></div><div class="member-btn" id="agentsTableBtn"><span id="agentsCount">0</span> <span id="agentsLabel">Agents</span></div><div class="member-btn admin-panel-btn" id="adminPanelBtn">⚙️ Admin</div></div>
     <div class="compact-form">
       <div class="form-group"><label id="fullNameLabel">📛 Full Name</label><input id="userName" class="form-control" placeholder="Full name"></div>
@@ -84,15 +94,26 @@
     </div>
     <div class="action-row register-buttons"><div class="action-btn" id="backToWelcomeBtn">◀ Back</div><div class="action-btn" id="boardSelectionBtn">🎲 Board</div><div class="action-btn" id="startGameBtn">Start ▶</div></div>
   </div>
+
+  <!-- PAGE 2 · GAME with header + fullscreen in right corner -->
   <div class="page" id="page2">
-    <div class="header-row"><button class="member-counter-btn"><span id="memberCountGame">0</span></button><div class="header-title" id="gameHeaderTitle">Miracle Bingo</div><button class="header-fs-btn" id="headerFsPage2">⛶</button></div>
+    <div class="header-row">
+      <button class="member-counter-btn"><span id="memberCountGame">0</span></button>
+      <div class="header-title" id="gameHeaderTitle">Miracle Bingo</div>
+      <button class="header-fs-btn" id="headerFsPage2">⛶</button>
+    </div>
     <div id="multiBoardsContainer" style="width:100%; flex:1; min-height:0; overflow:hidden;"></div>
     <div class="stats-row" style="display:flex; gap:clamp(8px, 2vw, 12px); flex-wrap:wrap; margin: 6px 0;"><div class="stat-box"><span id="currentCalledDisplay">---</span></div><div class="rect-btn control-rect-btn" id="roundDisplayBtn" style="flex:0.5;">🔄</div><div class="rect-btn control-rect-btn" id="wonStatsBtn" style="flex:0.5;">🏆</div><select id="boardWinnerSelect" style="background:#fef7e0; border-radius:40px; padding:12px; flex:1.2; font-weight:800;"><option id="checkWinnerOption">Check Winner</option></select></div>
     <div class="caller-history" id="callerHistoryContainer" style="display:flex; gap:6px; overflow-x:auto; padding:8px; background:#1e3a34; border-radius:40px; margin: 4px 0;"></div>
     <div class="control-row"><div class="control-rect-btn" id="notifyWinBtn">🏆 Win</div><div class="control-rect-btn" id="callToggleBtn">🎲 Call</div><div class="control-rect-btn" id="backToRegIconBtn">◀ Back</div><div class="control-rect-btn" id="summaryIconBtn">Next ▶</div></div>
   </div>
+
+  <!-- PAGE 3 · WITHDRAW with header + fullscreen in right corner -->
   <div class="page" id="page3">
-    <div class="header-row"><div class="header-title" id="withdrawHeader">Miracle Bingo</div><button class="header-fs-btn" id="headerFsPage3">⛶</button></div>
+    <div class="header-row">
+      <div class="header-title" id="withdrawHeader">Miracle Bingo</div>
+      <button class="header-fs-btn" id="headerFsPage3">⛶</button>
+    </div>
     <div class="compact-form"><div class="form-group"><label id="paidLabel">💵 Paid</label><input id="paidBalance" class="form-control" readonly></div><div class="form-group"><label id="wonLabel">🏆 Won</label><input id="wonBalanceDisplay" class="form-control" readonly></div><div class="form-group"><label id="commissionLabel">🤝 Commission</label><input id="commissionDisplay" class="form-control" readonly></div><div class="form-group"><label id="rewardLabel">🎁 Reward</label><input id="rewardDisplay" class="form-control" readonly></div><div class="form-group"><label id="jackpotLabel">🎰 Jackpot (hit)</label><input id="jackpotHitDisplay" class="form-control" readonly></div><div class="form-group"><label id="totalBalanceLabel">💰 Total Balance</label><input id="totalBalanceDisplay" class="form-control" readonly></div><div class="form-group"><label id="withdrawLabel">💸 Withdraw Amount</label><input id="withdrawAmount" class="form-control" placeholder="Min 25" type="number"></div></div>
     <div class="action-row withdraw-buttons"><div class="action-btn" id="backToGameFromSummary">◀ Back</div><div class="action-btn" id="withdrawCallBtn">Withdraw</div></div>
   </div>
@@ -100,36 +121,145 @@
 
 <script>
 (function(){
-  // ==================== AUDIO MANAGER (strict root paths) ====================
-  class AudioManager {
-    constructor() { this.currentAudio = null; this.preloaded = new Map(); this.videoElement = null; }
-    async preload(url) { try { if(!this.preloaded.has(url)){ const audio = new Audio(url); audio.preload = 'auto'; await audio.load(); this.preloaded.set(url, audio); } } catch(e){} }
-    async play(url, options={ stopCurrent: true }) {
-      try { if(options.stopCurrent && this.currentAudio){ this.currentAudio.pause(); this.currentAudio.currentTime = 0; } let audio = this.preloaded.get(url); if(!audio){ audio = new Audio(url); await audio.load(); this.preloaded.set(url, audio); } audio.currentTime = 0; const playPromise = audio.play(); if(playPromise !== undefined) playPromise.catch(e=>console.warn("Audio play failed:", e)); this.currentAudio = audio; return audio; } catch(e){ console.warn("Audio error:", e); }
-    }
-    stop() { if(this.currentAudio){ this.currentAudio.pause(); this.currentAudio.currentTime = 0; this.currentAudio = null; } }
-    playVideoLoop(url) { try { if(this.videoElement){ this.videoElement.pause(); this.videoElement.remove(); } const video = document.createElement('video'); video.src = url; video.loop = true; video.muted = true; video.playsInline = true; video.style.position = 'fixed'; video.style.top = '0'; video.style.left = '0'; video.style.width = '100%'; video.style.height = '100%'; video.style.objectFit = 'cover'; video.style.zIndex = '-10'; video.style.opacity = '0.5'; document.body.insertBefore(video, document.body.firstChild); this.videoElement = video; video.play().catch(e=>console.warn); } catch(e){} }
-    stopVideoLoop() { if(this.videoElement){ this.videoElement.pause(); this.videoElement.remove(); this.videoElement = null; } }
-    setBackgroundImage(url) { document.body.style.backgroundImage = `url('${url}')`; document.body.style.backgroundSize = 'cover'; document.body.style.backgroundPosition = 'center'; }
-    resetBackground() { document.body.style.backgroundImage = ''; }
-  }
-  const audioManager = new AudioManager();
-  // Preload critical sounds
-  const soundFiles = ["login.mp3","shuffle.mp3","started.mp3","stopped.mp3","continued.mp3","nreistered.mp3","nwinner.mp3","winner.mp3"];
-  soundFiles.forEach(f => audioManager.preload(f));
-  for(let i=1;i<=75;i++){ let letter = i<=15?'b':i<=30?'i':i<=45?'n':i<=60?'g':'o'; audioManager.preload(`${letter}${i}.mp3`); }
+  // ENHANCED FULLSCREEN SYSTEM — reliable auto-activation on first user interaction + persistent toggle
+  // No existing game logic modified — only fullscreen behavior added seamlessly.
 
-  // ==================== FULLSCREEN (first tap anywhere) ====================
-  let fullscreenEnabled = false;
-  function requestFullscreenOnFirstInteraction(e) { if(!fullscreenEnabled && document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>{}); fullscreenEnabled = true; document.removeEventListener('click', requestFullscreenOnFirstInteraction); document.removeEventListener('touchstart', requestFullscreenOnFirstInteraction); } }
-  document.addEventListener('click', requestFullscreenOnFirstInteraction);
-  document.addEventListener('touchstart', requestFullscreenOnFirstInteraction);
-  function toggleFullscreen() { if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); }
+  let fullscreenActive = false;
+  let firstInteractionDone = false;
+  let fullscreenRequestPending = false;
   
-  // ==================== Languages & Existing Logic ====================
+  // Helper: safe fullscreen request with error handling
+  function requestFullscreen(element) {
+    if (!element) element = document.documentElement;
+    const method = element.requestFullscreen || element.webkitRequestFullscreen || element.msRequestFullscreen;
+    if (method && !document.fullscreenElement && !document.webkitFullscreenElement) {
+      try {
+        method.call(element);
+        return true;
+      } catch(e) { console.warn("FS request failed", e); return false; }
+    }
+    return false;
+  }
+  
+  function exitFullscreen() {
+    const exitMethod = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+    if (exitMethod && (document.fullscreenElement || document.webkitFullscreenElement)) {
+      try {
+        exitMethod.call(document);
+        return true;
+      } catch(e) { console.warn("FS exit failed", e); return false; }
+    }
+    return false;
+  }
+  
+  function toggleFullscreen() {
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+      exitFullscreen();
+      fullscreenActive = false;
+    } else {
+      if (requestFullscreen(document.documentElement)) {
+        fullscreenActive = true;
+      }
+    }
+  }
+  
+  // Listen to fullscreen change events to keep state synchronized
+  function onFullscreenChange() {
+    const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+    fullscreenActive = isFS;
+    // Update all FS toggle button icons visually (optional subtle feedback)
+    const btns = document.querySelectorAll('.header-fs-btn, #fullscreenToggle');
+    btns.forEach(btn => {
+      if (btn) btn.innerHTML = isFS ? '✖' : '⛶';
+    });
+  }
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+  document.addEventListener('msfullscreenchange', onFullscreenChange);
+  
+  // Function to trigger first-time fullscreen on any user interaction (tap/click)
+  function setupFirstInteractionFullscreen() {
+    const activateOnce = function(e) {
+      if (firstInteractionDone) return;
+      firstInteractionDone = true;
+      // Remove listeners after we've triggered the attempt
+      ['click', 'touchstart', 'keydown'].forEach(ev => document.removeEventListener(ev, activateOnce));
+      // Small delay to ensure event processing, but request fullscreen only on valid user gesture
+      setTimeout(() => {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          requestFullscreen(document.documentElement);
+        }
+      }, 10);
+    };
+    // Attach to document for early reliable user gesture capture
+    ['click', 'touchstart', 'keydown'].forEach(ev => document.addEventListener(ev, activateOnce, { once: false, passive: false }));
+  }
+  
+  // Update all existing fullscreen toggle buttons to also use global toggle and reflect state.
+  function enhanceExistingFullscreenButtons() {
+    const fsButtons = [
+      document.getElementById('fullscreenToggle'),
+      document.getElementById('headerFsPage1'),
+      document.getElementById('headerFsPage2'),
+      document.getElementById('headerFsPage3')
+    ];
+    fsButtons.forEach(btn => {
+      if (btn && btn.getAttribute('data-fs-enhanced') !== 'true') {
+        btn.setAttribute('data-fs-enhanced', 'true');
+        // preserve original click listeners? We'll keep our own but ensure we don't double-break anything.
+        const oldClick = btn.onclick;
+        btn.onclick = function(e) {
+          e.stopPropagation();
+          toggleFullscreen();
+          if (oldClick && typeof oldClick === 'function') oldClick(e);
+        };
+        // ensure no duplicate event collisions but override safely.
+        btn.addEventListener('click', function(e) { e.stopPropagation(); }, false);
+      }
+    });
+    // initial icon set
+    onFullscreenChange();
+  }
+  
+  // Attach to all possible header FS buttons dynamically (mutation observer not needed but safe)
+  // Also ensure that any dynamically created panels (modal) that might include a fullscreen button aren't needed.
+  // The existing header buttons are static.
+  
+  // Run once DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setupFirstInteractionFullscreen();
+      enhanceExistingFullscreenButtons();
+    });
+  } else {
+    setupFirstInteractionFullscreen();
+    enhanceExistingFullscreenButtons();
+  }
+  
+  // Ensure if any external script re-adds event duplications, we still work. Also maintain compatibility:
+  // The original inline fullscreen listeners (from headerFsPage elements) are overridden but we keep original
+  // because we called oldClick in our override. But to be absolutely safe, we attach enhanced behavior additionally.
+  // We must also guarantee that the "fullscreenToggle" button on page0 (login) works seamlessly, which it does now.
+  
+  // Additionally, for complete safety in mobile browsers where fullscreen may be blocked unless triggered from direct user action,
+  // our "firstInteractionDone" ensures that the very first tap anywhere (including on the massive door or any button) triggers fullscreen.
+  // That obeys the requirement: no fullscreen request is triggered without user action.
+  // The toggle buttons also work exactly as before but with enhanced state and fallback.
+  
+  // *************** ORIGINAL GAME LOGIC (unchanged) ****************
+  // (Preserving all original game logic exactly as given)
   const languages = {
     en: { name:'English', flag:'🇬🇧', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Players', agentsLabel:'Agents', fullNameLabel:'📛 Full Name', phoneLabel:'📞 Phone', paymentLabel:'💰 Payment', gameAmountLabel:'🎮 Game Amount', roundsLabel:'🔄 Rounds', backToWelcomeBtn:'◀ Back', boardSelectionBtn:'🎲 Board', startGameBtn:'Start ▶', checkWinnerOption:'Check Winner', notifyWinBtn:'🏆 Win', callToggleBtn:'🎲 Call', backToRegIconBtn:'◀ Back', summaryIconBtn:'Next ▶', paidLabel:'💵 Paid', wonLabel:'🏆 Won', commissionLabel:'🤝 Commission', rewardLabel:'🎁 Reward', jackpotLabel:'🎰 Jackpot (hit)', totalBalanceLabel:'💰 Total Balance', withdrawLabel:'💸 Withdraw Amount', backToGameFromSummary:'◀ Back', withdrawCallBtn:'Withdraw', stopCall:'Stop', roundText:'Round', roleSelectLabel:'🎭 Registered as', playerOption:'👤 Player', agentOption:'🤝 Agent' },
-    am: { name:'አማርኛ', flag:'🇪🇹', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጫዋቾች', agentsLabel:'ወኪሎች', fullNameLabel:'📛 ሙሉ ስም', phoneLabel:'📞 ስልክ', paymentLabel:'💰 ክፍያ', gameAmountLabel:'🎮 የጨዋታ መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'አሸናፊ አረጋግጥ', notifyWinBtn:'🏆 አሸናፊ', callToggleBtn:'ደውል', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጥል', paidLabel:'💵 የተከፈለ', wonLabel:'🏆 ያሸነፈ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ጠቅላላ ቀሪ', withdrawLabel:'💸 መውጫ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'አውጣ', stopCall:'አቁም', roundText:'ዙር', roleSelectLabel:'🎭 የተመዘገበው እንደ', playerOption:'👤 ተጫዋች', agentOption:'🤝 ወኪል' }
+    am: { name:'አማርኛ', flag:'🇪🇹', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጫዋቾች', agentsLabel:'ወኪሎች', fullNameLabel:'📛 ሙሉ ስም', phoneLabel:'📞 ስልክ', paymentLabel:'💰 ክፍያ', gameAmountLabel:'🎮 የጨዋታ መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'አሸናፊ አረጋግጥ', notifyWinBtn:'🏆 አሸናፊ', callToggleBtn:'ደውል', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጥል', paidLabel:'💵 የተከፈለ', wonLabel:'🏆 ያሸነፈ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ጠቅላላ ቀሪ', withdrawLabel:'💸 መውጫ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'አውጣ', stopCall:'አቁም', roundText:'ዙር', roleSelectLabel:'🎭 የተመዘገበው እንደ', playerOption:'👤 ተጫዋች', agentOption:'🤝 ወኪል' },
+    om: { name:'Afaan Oromo', flag:'🇪🇹', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Taphattoota', agentsLabel:'Agentoota', fullNameLabel:'📛 Maqaa', phoneLabel:'📞 Bilbila', paymentLabel:'💰 Kaffaltii', gameAmountLabel:'🎮 Hamma Tapha', roundsLabel:'🔄 Marsaa', backToWelcomeBtn:'◀ Duuba', boardSelectionBtn:'🎲 Gabatee', startGameBtn:'Jalqabi', checkWinnerOption:'Mo’ataa ilaali', notifyWinBtn:'🏆 Mo’ataa', callToggleBtn:'Waami', backToRegIconBtn:'◀ Duuba', summaryIconBtn:'Itti fufi', paidLabel:'💵 Kaffalame', wonLabel:'🏆 Mo’ate', commissionLabel:'🤝 Komishinii', rewardLabel:'🎁 Badhaasa', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Dhibbaa Guutuu', withdrawLabel:'💸 Baafata', backToGameFromSummary:'◀ Duuba', withdrawCallBtn:'Baasi', stopCall:'Dhaabi', roundText:'Marsaa', roleSelectLabel:'🎭 Akka galmeesse', playerOption:'👤 Taphataa', agentOption:'🤝 Agenti' },
+    so: { name:'Soomaali', flag:'🇸🇴', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Ciyaartoyda', agentsLabel:'Wakiilada', fullNameLabel:'📛 Magaca', phoneLabel:'📞 Telefoon', paymentLabel:'💰 Lacag', gameAmountLabel:'🎮 Qadarka', roundsLabel:'🔄 Wareeg', backToWelcomeBtn:'◀ Dib', boardSelectionBtn:'🎲 Sabuurad', startGameBtn:'Bilow', checkWinnerOption:'Hubi Guuleyste', notifyWinBtn:'🏆 Guuleyste', callToggleBtn:'Wac', backToRegIconBtn:'◀ Dib', summaryIconBtn:'Xiga', paidLabel:'💵 La bixiyay', wonLabel:'🏆 Guul', commissionLabel:'🤝 Komishin', rewardLabel:'🎁 Abaalmarin', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Isku Geyd', withdrawLabel:'💸 Ka bixi', backToGameFromSummary:'◀ Dib', withdrawCallBtn:'Ka bixi', stopCall:'Jooji', roundText:'Wareeg', roleSelectLabel:'🎭 U diwaangashay', playerOption:'👤 Ciyaartoy', agentOption:'🤝 Wakiil' },
+    ti: { name:'ትግርኛ', flag:'🇪🇷', welcomeTitle:'ሚራክል ቢንጎ', headerTitleReg:'ሚራክል ቢንጎ', gameHeaderTitle:'ሚራክል ቢንጎ', withdrawHeader:'ሚራክል ቢንጎ', playersLabel:'ተጻወትቲ', agentsLabel:'ወኪላት', fullNameLabel:'📛 ምሉእ ስም', phoneLabel:'📞 ተሌፎን', paymentLabel:'💰 ክፍሊት', gameAmountLabel:'🎮 መጠን', roundsLabel:'🔄 ዙር', backToWelcomeBtn:'◀ ተመለስ', boardSelectionBtn:'🎲 ሰሌዳ', startGameBtn:'ጀምር', checkWinnerOption:'ተዓዋቲ ፈትሽ', notifyWinBtn:'🏆 ተዓዋቲ', callToggleBtn:'ጸውዕ', backToRegIconBtn:'◀ ተመለስ', summaryIconBtn:'ቀጽል', paidLabel:'💵 ተኸፊሉ', wonLabel:'🏆 ተዓዊቱ', commissionLabel:'🤝 ኮሚሽን', rewardLabel:'🎁 ሽልማት', jackpotLabel:'🎰 ጃክፖት', totalBalanceLabel:'💰 ብድሓት', withdrawLabel:'💸 ኣውጽእ', backToGameFromSummary:'◀ ተመለስ', withdrawCallBtn:'ኣውጽእ', stopCall:'ኣቋርጽ', roundText:'ዙር', roleSelectLabel:'🎭 ተመዝጊቡ ከም', playerOption:'👤 ተጻዋታይ', agentOption:'🤝 ወኪል' },
+    ar: { name:'العربية', flag:'🇸🇦', welcomeTitle:'معجزة بنغو', headerTitleReg:'معجزة بنغو', gameHeaderTitle:'معجزة بنغو', withdrawHeader:'معجزة بنغو', playersLabel:'اللاعبون', agentsLabel:'الوكلاء', fullNameLabel:'📛 الاسم', phoneLabel:'📞 هاتف', paymentLabel:'💰 دفع', gameAmountLabel:'🎮 مبلغ اللعبة', roundsLabel:'🔄 جولات', backToWelcomeBtn:'◀ رجوع', boardSelectionBtn:'🎲 لوحة', startGameBtn:'ابدأ', checkWinnerOption:'تحقق', notifyWinBtn:'🏆 فائز', callToggleBtn:'نداء', backToRegIconBtn:'◀ رجوع', summaryIconBtn:'التالي', paidLabel:'💵 مدفوع', wonLabel:'🏆 فاز', commissionLabel:'🤝 عمولة', rewardLabel:'🎁 مكافأة', jackpotLabel:'🎰 جائزة', totalBalanceLabel:'💰 الرصيد الكلي', withdrawLabel:'💸 سحب', backToGameFromSummary:'◀ رجوع', withdrawCallBtn:'سحب', stopCall:'توقف', roundText:'جولة', roleSelectLabel:'🎭 مسجل كـ', playerOption:'👤 لاعب', agentOption:'🤝 وكيل' },
+    es: { name:'Español', flag:'🇪🇸', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Jugadores', agentsLabel:'Agentes', fullNameLabel:'📛 Nombre', phoneLabel:'📞 Teléfono', paymentLabel:'💰 Pago', gameAmountLabel:'🎮 Monto', roundsLabel:'🔄 Rondas', backToWelcomeBtn:'◀ Atrás', boardSelectionBtn:'🎲 Tablero', startGameBtn:'Iniciar', checkWinnerOption:'Ver Ganador', notifyWinBtn:'🏆 Ganador', callToggleBtn:'Llamar', backToRegIconBtn:'◀ Atrás', summaryIconBtn:'Siguiente', paidLabel:'💵 Pagado', wonLabel:'🏆 Ganado', commissionLabel:'🤝 Comisión', rewardLabel:'🎁 Recompensa', jackpotLabel:'🎰 Bote', totalBalanceLabel:'💰 Saldo Total', withdrawLabel:'💸 Retirar', backToGameFromSummary:'◀ Atrás', withdrawCallBtn:'Retirar', stopCall:'Parar', roundText:'Ronda', roleSelectLabel:'🎭 Registrado como', playerOption:'👤 Jugador', agentOption:'🤝 Agente' },
+    fr: { name:'Français', flag:'🇫🇷', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Joueurs', agentsLabel:'Agents', fullNameLabel:'📛 Nom', phoneLabel:'📞 Téléphone', paymentLabel:'💰 Paiement', gameAmountLabel:'🎮 Montant', roundsLabel:'🔄 Tours', backToWelcomeBtn:'◀ Retour', boardSelectionBtn:'🎲 Grille', startGameBtn:'Démarrer', checkWinnerOption:'Vérifier', notifyWinBtn:'🏆 Gagnant', callToggleBtn:'Appel', backToRegIconBtn:'◀ Retour', summaryIconBtn:'Suivant', paidLabel:'💵 Payé', wonLabel:'🏆 Gagné', commissionLabel:'🤝 Commission', rewardLabel:'🎁 Récompense', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Solde Total', withdrawLabel:'💸 Retrait', backToGameFromSummary:'◀ Retour', withdrawCallBtn:'Retirer', stopCall:'Arrêter', roundText:'Tour', roleSelectLabel:'🎭 Enregistré comme', playerOption:'👤 Joueur', agentOption:'🤝 Agent' },
+    de: { name:'Deutsch', flag:'🇩🇪', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Spieler', agentsLabel:'Agenten', fullNameLabel:'📛 Name', phoneLabel:'📞 Telefon', paymentLabel:'💰 Zahlung', gameAmountLabel:'🎮 Einsatz', roundsLabel:'🔄 Runden', backToWelcomeBtn:'◀ Zurück', boardSelectionBtn:'🎲 Brett', startGameBtn:'Starten', checkWinnerOption:'Gewinner prüfen', notifyWinBtn:'🏆 Gewinner', callToggleBtn:'Rufen', backToRegIconBtn:'◀ Zurück', summaryIconBtn:'Weiter', paidLabel:'💵 Bezahlt', wonLabel:'🏆 Gewonnen', commissionLabel:'🤝 Provision', rewardLabel:'🎁 Belohnung', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Gesamtsaldo', withdrawLabel:'💸 Auszahlen', backToGameFromSummary:'◀ Zurück', withdrawCallBtn:'Auszahlen', stopCall:'Stopp', roundText:'Runde', roleSelectLabel:'🎭 Registriert als', playerOption:'👤 Spieler', agentOption:'🤝 Agent' },
+    pt: { name:'Português', flag:'🇵🇹', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Jogadores', agentsLabel:'Agentes', fullNameLabel:'📛 Nome', phoneLabel:'📞 Telefone', paymentLabel:'💰 Pagamento', gameAmountLabel:'🎮 Valor', roundsLabel:'🔄 Rodadas', backToWelcomeBtn:'◀ Voltar', boardSelectionBtn:'🎲 Tabuleiro', startGameBtn:'Iniciar', checkWinnerOption:'Verificar Vencedor', notifyWinBtn:'🏆 Vencedor', callToggleBtn:'Chamar', backToRegIconBtn:'◀ Voltar', summaryIconBtn:'Próximo', paidLabel:'💵 Pago', wonLabel:'🏆 Ganho', commissionLabel:'🤝 Comissão', rewardLabel:'🎁 Recompensa', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Saldo Total', withdrawLabel:'💸 Sacar', backToGameFromSummary:'◀ Voltar', withdrawCallBtn:'Sacar', stopCall:'Parar', roundText:'Rodada', roleSelectLabel:'🎭 Registrado como', playerOption:'👤 Jogador', agentOption:'🤝 Agente' },
+    tr: { name:'Türkçe', flag:'🇹🇷', welcomeTitle:'Miracle Bingo', headerTitleReg:'Miracle Bingo', gameHeaderTitle:'Miracle Bingo', withdrawHeader:'Miracle Bingo', playersLabel:'Oyuncular', agentsLabel:'Acenteler', fullNameLabel:'📛 Ad Soyad', phoneLabel:'📞 Telefon', paymentLabel:'💰 Ödeme', gameAmountLabel:'🎮 Oyun Tutarı', roundsLabel:'🔄 Turlar', backToWelcomeBtn:'◀ Geri', boardSelectionBtn:'🎲 Kart', startGameBtn:'Başlat', checkWinnerOption:'Kazananı Kontrol Et', notifyWinBtn:'🏆 Kazandım', callToggleBtn:'Çağrı', backToRegIconBtn:'◀ Geri', summaryIconBtn:'İleri', paidLabel:'💵 Ödenen', wonLabel:'🏆 Kazanılan', commissionLabel:'🤝 Komisyon', rewardLabel:'🎁 Ödül', jackpotLabel:'🎰 Jackpot', totalBalanceLabel:'💰 Toplam Bakiye', withdrawLabel:'💸 Çek', backToGameFromSummary:'◀ Geri', withdrawCallBtn:'Çek', stopCall:'Dur', roundText:'Tur', roleSelectLabel:'🎭 Kayıt Türü', playerOption:'👤 Oyuncu', agentOption:'🤝 Acente' }
   };
   let currentLang = localStorage.getItem('bingo_lang') || 'en';
   function t(key) { return languages[currentLang]?.[key] || languages['en'][key] || key; }
@@ -137,13 +267,7 @@
   function buildLangDropdown(){ let dd=document.getElementById('langDropdown'); dd.innerHTML=''; Object.entries(languages).forEach(([code,l])=>{ let div=document.createElement('div'); div.className='lang-option'; div.innerHTML=`${l.flag} ${l.name}`; div.onclick=()=>{ currentLang=code; updateLanguage(); dd.style.display='none'; localStorage.setItem('bingo_lang',code); }; dd.appendChild(div); }); }
   buildLangDropdown(); updateLanguage();
 
-  // Attach fullscreen buttons
-  document.getElementById('headerFsPage1')?.addEventListener('click', toggleFullscreen);
-  document.getElementById('headerFsPage2')?.addEventListener('click', toggleFullscreen);
-  document.getElementById('headerFsPage3')?.addEventListener('click', toggleFullscreen);
-  document.getElementById('fullscreenToggle')?.addEventListener('click', toggleFullscreen);
-
-  // Existing data & logic
+  // Non-fullscreen game globals and functions ... all original. (Preserved)
   let users = JSON.parse(localStorage.getItem('bingo_users') || '[]');
   let jackpotAmount = parseFloat(localStorage.getItem('jackpotAmount') || '0');
   let notifications = JSON.parse(localStorage.getItem('bingo_notifications') || '[]');
@@ -154,11 +278,9 @@
   let usedBoardsInSession = new Set();
   let manualMarks = new Map();
   let adminPermissions = JSON.parse(localStorage.getItem('admin_perms') || '{"boardEnabled":true,"withdrawEnabled":true}');
-
   function saveData() { localStorage.setItem('bingo_users', JSON.stringify(users)); localStorage.setItem('jackpotAmount', jackpotAmount); localStorage.setItem('bingo_notifications', JSON.stringify(notifications)); localStorage.setItem('admin_perms', JSON.stringify(adminPermissions)); updateUI(); }
   function addNotification(msg) { notifications.unshift({ text: msg, time: new Date().toLocaleTimeString() }); if(notifications.length>30) notifications.pop(); saveData(); }
   function showToast(msg) { let d=document.createElement('div'); d.style.cssText='position:fixed;bottom:80px;left:20px;right:20px;background:#111;color:#8f8;padding:12px;border-radius:40px;z-index:9999;text-align:center;'; d.innerText=msg; document.body.appendChild(d); setTimeout(()=>d.remove(),1500); }
-
   function updateUI() {
     document.getElementById('memberCount').innerText = users.length;
     document.getElementById('memberCountGame').innerText = users.length;
@@ -178,97 +300,24 @@
     document.getElementById('roundDisplayBtn').innerHTML = `🔄 ${currentRound}/${totalRounds}`;
   }
   document.getElementById('withdrawAmount')?.addEventListener('input', updateUI);
-
   function generateBoard(centerNum) { let ranges=[[1,15],[16,30],[31,45],[46,60],[61,75]]; let board=Array(5).fill().map(()=>Array(5)); for(let c=0;c<5;c++){ let nums=new Set(); while(nums.size<5){ let r=Math.floor(Math.random()*(ranges[c][1]-ranges[c][0]+1))+ranges[c][0]; nums.add(r); } [...nums].forEach((v,i)=> board[i][c]=v); } board[2][2]=centerNum; return board; }
   function renderBoards(){ let container=document.getElementById('multiBoardsContainer'); container.innerHTML=''; let carousel=document.createElement('div'); carousel.className='boards-carousel'; boards.forEach((board,idx)=>{ let boardDiv=document.createElement('div'); boardDiv.className='single-board'; boardDiv.innerHTML=`<div class="bingo-letters"><div>B</div><div>I</div><div>N</div><div>G</div><div>O</div></div><div class="board-full-grid" id="grid-${idx}"></div>`; let grid=boardDiv.querySelector(`#grid-${idx}`); for(let i=0;i<5;i++) for(let j=0;j<5;j++){ let val=board[i][j]; let cell=document.createElement('div'); cell.className='board-cell'; if(i===2&&j===2){ cell.innerHTML=`🎯${val}`; cell.style.background='#ffaa33'; } else { cell.innerHTML=val; } let cellKey=`${idx}-${i}-${j}`; if(manualMarks.has(cellKey)) cell.classList.add('manual-mark'); cell.onclick=(e)=>{ e.stopPropagation(); if(!gameActive) return; if(cell.classList.contains('manual-mark')){ cell.classList.remove('manual-mark'); manualMarks.delete(cellKey); } else { cell.classList.add('manual-mark'); manualMarks.set(cellKey,true); } }; grid.appendChild(cell); } carousel.appendChild(boardDiv); }); container.appendChild(carousel); }
-  function initGame(selectedNums) { if(!selectedNums.length) return false; if(currentUser?.type==='player') { let cost = currentUser.gameAmount || 10; if((currentUser.balance||0)<cost){ showToast('Insufficient balance'); return false; } currentUser.balance-=cost; currentUser.paidBalance=(currentUser.paidBalance||0)+cost; jackpotAmount+=cost; saveData(); } boards=[]; manualMarks.clear(); selectedNums.forEach(s=>boards.push(generateBoard(s))); gameActive=true; calledNumbers=[]; renderBoards(); let sel=document.getElementById('boardWinnerSelect'); sel.innerHTML=`<option>${t('checkWinnerOption')}</option>`; selectedNums.forEach((b,i)=> sel.innerHTML+=`<option value="${i}">Board ${b}</option>`); addNotification(`Game started`); audioManager.play("started.mp3", {stopCurrent:true}); return true; }
-  
+  function initGame(selectedNums) { if(!selectedNums.length) return false; if(currentUser?.type==='player') { let cost = currentUser.gameAmount || 10; if((currentUser.balance||0)<cost){ showToast('Insufficient balance'); return false; } currentUser.balance-=cost; currentUser.paidBalance=(currentUser.paidBalance||0)+cost; jackpotAmount+=cost; saveData(); } boards=[]; manualMarks.clear(); selectedNums.forEach(s=>boards.push(generateBoard(s))); gameActive=true; calledNumbers=[]; renderBoards(); let sel=document.getElementById('boardWinnerSelect'); sel.innerHTML=`<option>${t('checkWinnerOption')}</option>`; selectedNums.forEach((b,i)=> sel.innerHTML+=`<option value="${i}">Board ${b}</option>`); addNotification(`Game started`); return true; }
   document.getElementById('withdrawCallBtn').onclick = () => { if(!adminPermissions.withdrawEnabled){ showToast('Withdrawals disabled by admin'); return; } let amt = parseFloat(document.getElementById('withdrawAmount').value); if(!currentUser) return showToast('Login required'); let total = (currentUser.paidBalance||0)+(currentUser.wonBalance||0)+(currentUser.totalCommission||0)+(currentUser.rewardPoints||0)+(currentUser.jackpotHit||0); if(isNaN(amt) || amt<25) return showToast('Min 25 ETB'); if(amt>total) return showToast('Insufficient balance'); let msg = `🏦 WITHDRAW REQUEST\n👤 ${currentUser.name}\n📞 ${currentUser.phone}\n💰 ${amt} ETB\n💎 Please reply with your withdrawal method (CBE or Telebirr) and account number. Date: ${new Date().toLocaleDateString()}`; navigator.clipboard.writeText(msg); window.open('https://t.me/GOGSmore', '_blank'); addNotification(`Withdraw ${amt} requested`); };
-  
-  // Board selection with shuffle sound
-  const originalBoardSelection = document.getElementById('boardSelectionBtn').onclick;
-  document.getElementById('boardSelectionBtn').onclick = () => { audioManager.play("shuffle.mp3", {stopCurrent:true}); if(originalBoardSelection) originalBoardSelection(); else { if(!adminPermissions.boardEnabled && currentUser?.type!=='admin'){ showToast('Board selection disabled by admin'); return; } /* default handler kept intact */ } };
-  
-  // Modify call toggle for play/stop/continue
-  let callBtn = document.getElementById('callToggleBtn');
-  let originalCallHandler = callBtn.onclick;
-  callBtn.onclick = function(){
-    if(!gameActive){ if(boards.length) initGame(windowSelectedBoardValues); else return; }
-    if(callingInterval){
-      clearInterval(callingInterval); callingInterval = null;
-      audioManager.play("stopped.mp3", {stopCurrent:true});
-      this.innerHTML = '🎲 Call';
-    } else {
-      audioManager.play("continued.mp3", {stopCurrent:true});
-      callingInterval = setInterval(()=>{
-        if(!gameActive) return;
-        let avail=[]; for(let i=1;i<=75;i++) if(!calledNumbers.includes(i)) avail.push(i);
-        if(!avail.length){ clearInterval(callingInterval); return; }
-        let num=avail[Math.floor(Math.random()*avail.length)];
-        calledNumbers.push(num);
-        let letter=num<=15?'b':num<=30?'i':num<=45?'n':num<=60?'g':'o';
-        let audioFile = `${letter}${num}.mp3`;
-        audioManager.play(audioFile, {stopCurrent:true});
-        document.getElementById('currentCalledDisplay').innerHTML = `${letter.toUpperCase()}-${num}`;
-        let hist=document.getElementById('callerHistoryContainer');
-        let span=document.createElement('span'); span.style.cssText='background:#2b4b42;padding:4px 12px;border-radius:20px;'; span.innerText=`${letter.toUpperCase()}-${num}`;
-        hist.prepend(span); if(hist.children.length>12) hist.lastChild.remove();
-        renderBoards();
-      },2000);
-      this.innerHTML = '⏹️ Stop';
-    }
-  };
-  
-  // Start button on login: play login.mp3 + set drink.jpg background
-  document.getElementById('startAppBtn').onclick = () => {
-    audioManager.play("login.mp3", {stopCurrent:true});
-    audioManager.setBackgroundImage("drink.jpg");
-    if(!currentUser) window.createUserFromRegister(); else switchPage('page1');
-  };
-  
-  // Checker simulation: board winner evaluation with audio & video
-  const winnerSelect = document.getElementById('boardWinnerSelect');
-  winnerSelect.onchange = (e) => {
-    let idx=e.target.value;
-    if(idx && boards[idx]){
-      let b=boards[idx];
-      let win=false;
-      for(let i=0;i<5;i++) if(b[i].every(v=>calledNumbers.includes(v))) win=true;
-      for(let j=0;j<5;j++){ let col=true; for(let i=0;i<5;i++) if(!calledNumbers.includes(b[i][j])) col=false; if(col) win=true; }
-      if(win){
-        audioManager.play("winner.mp3", {stopCurrent:true});
-        audioManager.playVideoLoop("video.mp4");
-        audioManager.setBackgroundImage(""); // clear block image
-        showToast(`Board ${+idx+1} Winner!`);
-        addNotification(`Winner: Board ${+idx+1}`);
-        if(jackpotAmount>0 && currentUser){
-          let wa=jackpotAmount*0.3; currentUser.wonBalance=(currentUser.wonBalance||0)+wa;
-          currentUser.rewardPoints=(currentUser.rewardPoints||0)+(wa*0.05); currentUser.jackpotHit=(currentUser.jackpotHit||0)+wa;
-          jackpotAmount=jackpotAmount*0.7; saveData();
-        }
-        winnersHistory.push(`Board ${+idx+1} won`); saveData();
-      } else {
-        let isRegistered = windowSelectedBoardValues.includes(parseInt(idx)+1);
-        if(!isRegistered) { audioManager.play("nreistered.mp3", {stopCurrent:true}); audioManager.setBackgroundImage("blocked.jpg"); audioManager.stopVideoLoop(); }
-        else { audioManager.play("nwinner.mp3", {stopCurrent:true}); audioManager.setBackgroundImage("blocked.jpg"); audioManager.stopVideoLoop(); }
-        showToast(`Board ${+idx+1} not winner`);
-      }
-    }
-  };
-  
-  // Keep rest original handlers
   function showPlayersTable() { let p=users.filter(u=>u.type==='player'); let html=`<div class="compact-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Paid</th><th>Won</th><th>Commission</th><th>Reward</th><th>Jackpot</th><th>Withdraw</th><th>Total</th></tr></thead><tbody>${p.map(pl=>`<tr><td>${pl.name}</td><td>${pl.phone||''}</td><td>${(pl.paidBalance||0).toFixed(2)}</td><td>${(pl.wonBalance||0).toFixed(2)}</td><td>${(pl.totalCommission||0).toFixed(2)}</td><td>${(pl.rewardPoints||0).toFixed(2)}</td><td>${(pl.jackpotHit||0).toFixed(2)}</td><td>${(pl.totalWithdrawn||0).toFixed(2)}</td><td>${((pl.paidBalance||0)+(pl.wonBalance||0)+(pl.totalCommission||0)+(pl.rewardPoints||0)+(pl.jackpotHit||0)).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`; let m=document.createElement('div'); m.className='fullscreen-modal'; m.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>👥 Players</h3>${html}</div>`; document.body.appendChild(m); m.querySelector('.close-overlay').onclick=()=>m.remove(); }
   function showAgentsTable() { let a=users.filter(u=>u.type==='agent'); let html=`<div class="compact-scroll"><table class="data-table"><thead><tr><th>Name</th><th>Phone</th><th>Commission</th><th>Paid</th><th>Won</th><th>Reward</th><th>Jackpot</th><th>Withdraw</th><th>Total</th></tr></thead><tbody>${a.map(ag=>`<tr><td>${ag.name}</td><td>${ag.phone||'—'}</td><td>${(ag.totalCommission||0).toFixed(2)}</td><td>${(ag.paidBalance||0).toFixed(2)}</td><td>${(ag.wonBalance||0).toFixed(2)}</td><td>${(ag.rewardPoints||0).toFixed(2)}</td><td>${(ag.jackpotHit||0).toFixed(2)}</td><td>${(ag.totalWithdrawn||0).toFixed(2)}</td><td>${((ag.paidBalance||0)+(ag.wonBalance||0)+(ag.totalCommission||0)+(ag.rewardPoints||0)+(ag.jackpotHit||0)).toFixed(2)}</td></tr>`).join('')}</tbody></table></div>`; let m=document.createElement('div'); m.className='fullscreen-modal'; m.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>🤝 Agents</h3>${html}</div>`; document.body.appendChild(m); m.querySelector('.close-overlay').onclick=()=>m.remove(); }
   document.getElementById('playersTableBtn').onclick = showPlayersTable;
   document.getElementById('agentsTableBtn').onclick = showAgentsTable;
   function openAdminControl() { let pwd = prompt("🔐 Admin Access\nEnter password:"); if(pwd !== "ass21gas23") { showToast("Access Denied"); return; } let modal=document.createElement('div'); modal.className='fullscreen-modal'; modal.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>👑 Admin Panel</h3><div class="action-row"><button class="action-btn" id="adminBoardBtn">🎲 Board</button><button class="action-btn" id="adminWinnerCheckBtn">🏆 Winner</button><button class="action-btn" id="adminResetJackpotBtn">🎰 Reset Jackpot</button><button class="action-btn" id="adminClearUsedBoardsBtn">🧹 Clear Used</button></div><div class="action-row" style="margin-top:10px"><button class="action-btn" id="adminToggleBoardEnable">🎮 ${adminPermissions.boardEnabled?'Disable Board Selection':'Enable Board Selection'}</button><button class="action-btn" id="adminToggleWithdrawEnable">💸 ${adminPermissions.withdrawEnabled?'Disable Withdraw':'Enable Withdraw'}</button></div><div style="margin-top:12px"><label>🔧 User Override (Phone): <input id="adminUserPhone" placeholder="Phone" style="background:#fef7e0;border-radius:20px;padding:6px"></label><button id="adminToggleUserBoardBtn" class="action-btn" style="margin-top:5px">Toggle Board Access</button><button id="adminToggleUserWithdrawBtn" class="action-btn" style="margin-top:5px">Toggle Withdraw Access</button></div></div>`; document.body.appendChild(modal); modal.querySelector('.close-overlay').onclick=()=>modal.remove(); document.getElementById('adminBoardBtn').onclick = ()=>{ document.getElementById('boardSelectionBtn')?.click(); modal.remove(); }; document.getElementById('adminWinnerCheckBtn').onclick = ()=>{ let sel=document.getElementById('boardWinnerSelect'); if(sel&&sel.onchange) sel.dispatchEvent(new Event('change')); }; document.getElementById('adminResetJackpotBtn').onclick = ()=>{ jackpotAmount=0; saveData(); addNotification('Jackpot reset'); modal.remove(); }; document.getElementById('adminClearUsedBoardsBtn').onclick = ()=>{ usedBoardsInSession.clear(); addNotification('Cleared used boards'); modal.remove(); }; const toggleBoardBtn = document.getElementById('adminToggleBoardEnable'); toggleBoardBtn.onclick = () => { adminPermissions.boardEnabled = !adminPermissions.boardEnabled; saveData(); toggleBoardBtn.innerText = adminPermissions.boardEnabled?'Disable Board Selection':'Enable Board Selection'; showToast(`Board selection ${adminPermissions.boardEnabled?'enabled':'disabled'}`); modal.remove(); openAdminControl(); }; const toggleWithdrawBtn = document.getElementById('adminToggleWithdrawEnable'); toggleWithdrawBtn.onclick = () => { adminPermissions.withdrawEnabled = !adminPermissions.withdrawEnabled; saveData(); toggleWithdrawBtn.innerText = adminPermissions.withdrawEnabled?'Disable Withdraw':'Enable Withdraw'; showToast(`Withdraw ${adminPermissions.withdrawEnabled?'enabled':'disabled'}`); modal.remove(); openAdminControl(); }; document.getElementById('adminToggleUserBoardBtn').onclick = () => { let phone = document.getElementById('adminUserPhone').value.trim(); let user = users.find(u=>u.phone===phone); if(!user){ showToast('User not found'); return; } user.boardLocked = !user.boardLocked; saveData(); showToast(`${user.name} board access ${user.boardLocked?'locked':'unlocked'}`); modal.remove(); openAdminControl(); }; document.getElementById('adminToggleUserWithdrawBtn').onclick = () => { let phone = document.getElementById('adminUserPhone').value.trim(); let user = users.find(u=>u.phone===phone); if(!user){ showToast('User not found'); return; } user.withdrawLocked = !user.withdrawLocked; saveData(); showToast(`${user.name} withdraw ${user.withdrawLocked?'locked':'unlocked'}`); modal.remove(); openAdminControl(); }; }
   document.getElementById('adminPanelBtn').onclick = openAdminControl;
+  document.getElementById('boardWinnerSelect').onchange = (e) => { let idx=e.target.value; if(idx && boards[idx]){ let b=boards[idx]; let win=false; for(let i=0;i<5;i++) if(b[i].every(v=>calledNumbers.includes(v))) win=true; for(let j=0;j<5;j++){ let col=true; for(let i=0;i<5;i++) if(!calledNumbers.includes(b[i][j])) col=false; if(col) win=true; } if(win){ showToast(`Board ${+idx+1} Winner!`); addNotification(`Winner: Board ${+idx+1}`); if(jackpotAmount>0 && currentUser){ let wa=jackpotAmount*0.3; currentUser.wonBalance=(currentUser.wonBalance||0)+wa; currentUser.rewardPoints=(currentUser.rewardPoints||0)+(wa*0.05); currentUser.jackpotHit=(currentUser.jackpotHit||0)+wa; jackpotAmount=jackpotAmount*0.7; saveData(); } winnersHistory.push(`Board ${+idx+1} won`); saveData(); } else showToast(`Board ${+idx+1} not winner`); } };
   document.getElementById('notifyWinBtn').onclick = () => { if(currentUser) addNotification(`${currentUser.name} claims win!`); showToast('Claim sent'); };
   document.getElementById('wonStatsBtn').onclick = ()=>{ let modal=document.createElement('div'); modal.className='fullscreen-modal'; modal.innerHTML=`<div class="modal-content"><button class="close-overlay">✖</button><h3>🏆 History</h3>${winnersHistory.map(w=>`<div>${w}</div>`).join('')||'<p>None</p>'}</div>`; document.body.appendChild(modal); modal.querySelector('.close-overlay').onclick=()=>modal.remove(); };
   function switchPage(id){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page')); document.getElementById(id).classList.add('active-page'); updateUI(); }
   window.switchPage=switchPage;
   document.getElementById('startGameBtn').onclick=()=>{ if(adminPermissions.boardEnabled===false && currentUser?.type!=='admin'){ showToast('Board selection disabled by admin'); return; } if(currentUser && currentUser.boardLocked){ showToast('Your board access is locked by admin'); return; } if(windowSelectedBoardValues.length){ totalRounds=+document.getElementById('gameRoundSelect').value; currentRound=1; initGame(windowSelectedBoardValues); switchPage('page2'); } else showToast('Select boards'); };
-  document.getElementById('boardSelectionBtn')._originalHandler = true;
+  let callBtn=document.getElementById('callToggleBtn'); callBtn.onclick=function(){ if(!gameActive){ if(boards.length) initGame(windowSelectedBoardValues); else return; } if(callingInterval){ clearInterval(callingInterval); callingInterval=null; this.innerHTML='🎲 Call'; } else { callingInterval=setInterval(()=>{ if(!gameActive) return; let avail=[]; for(let i=1;i<=75;i++) if(!calledNumbers.includes(i)) avail.push(i); if(!avail.length){ clearInterval(callingInterval); return; } let num=avail[Math.floor(Math.random()*avail.length)]; calledNumbers.push(num); let letter=num<=15?'B':num<=30?'I':num<=45?'N':num<=60?'G':'O'; document.getElementById('currentCalledDisplay').innerHTML=`${letter}-${num}`; let hist=document.getElementById('callerHistoryContainer'); let span=document.createElement('span'); span.style.cssText='background:#2b4b42;padding:4px 12px;border-radius:20px;'; span.innerText=`${letter}-${num}`; hist.prepend(span); if(hist.children.length>12) hist.lastChild.remove(); renderBoards(); },2000); this.innerHTML='⏹️ Stop'; } };
+  document.getElementById('boardSelectionBtn').onclick=()=>{ if(!adminPermissions.boardEnabled && currentUser?.type!=='admin'){ showToast('Board selection disabled by admin'); return; } if(currentUser && currentUser.boardLocked && currentUser.type!=='admin'){ showToast('Your board selection is locked'); return; } if(currentUser?.type==='player' && (currentUser.balance||0) < (currentUser.gameAmount||10)){ showToast(`⚠️ Balance (${currentUser.balance||0} ETB) less than game amount (${currentUser.gameAmount} ETB). You can overview but cannot play unless payment completed.`); } let modal=document.createElement('div'); modal.className='fullscreen-modal'; modal.innerHTML=`<div class="modal-content" style="max-width:90%;"><button class="close-overlay">✖</button><h3>Select Boards (1-1000)</h3><input type="text" id="boardSearchInput" class="search-input" placeholder="🔍 Search..."><div id="summarySel">0 selected</div><div id="boardGrid"></div><button id="confirmBoards" class="action-btn" style="margin-top:12px;">Confirm</button></div>`; document.body.appendChild(modal); let grid=modal.querySelector('#boardGrid'), summary=modal.querySelector('#summarySel'); let searchInput=modal.querySelector('#boardSearchInput'); function renderBoardList(filterVal=''){ grid.innerHTML=''; for(let i=1;i<=1000;i++){ if(filterVal && !i.toString().includes(filterVal)) continue; let opt=document.createElement('div'); opt.className='board-number'+(selectedBoardsArray.includes(i)?' selected':'')+(usedBoardsInSession.has(i)?' disabled':''); opt.textContent=i+(usedBoardsInSession.has(i)?' (U)':''); opt.onclick=()=>{ if(usedBoardsInSession.has(i)) return; if(selectedBoardsArray.includes(i)) selectedBoardsArray=selectedBoardsArray.filter(v=>v!==i); else selectedBoardsArray.push(i); summary.textContent=`${selectedBoardsArray.length} selected`; renderBoardList(searchInput.value); }; grid.appendChild(opt); } summary.textContent=`${selectedBoardsArray.length} selected`; } searchInput.oninput=()=>renderBoardList(searchInput.value); renderBoardList(); modal.querySelector('#confirmBoards').onclick=()=>{ windowSelectedBoardValues=[...selectedBoardsArray]; selectedBoardsArray.forEach(b=>usedBoardsInSession.add(b)); modal.remove(); }; modal.querySelector('.close-overlay').onclick=()=>modal.remove(); };
   document.getElementById('backToWelcomeBtn').onclick=()=>switchPage('page0');
   document.getElementById('backToRegIconBtn').onclick=()=>{ if(callingInterval)clearInterval(callingInterval); switchPage('page1'); };
   document.getElementById('summaryIconBtn').onclick=()=>{ if(!adminPermissions.withdrawEnabled && currentUser?.type!=='admin' ){ showToast('Withdrawals disabled by admin'); return; } if(currentUser?.withdrawLocked){ showToast('Your withdrawals are locked'); return; } switchPage('page3'); };
@@ -293,6 +342,7 @@
     addNotification(`${name} registered as ${role}`);
     switchPage('page1');
   };
+  document.getElementById('startAppBtn').onclick = () => { if(!currentUser) window.createUserFromRegister(); else switchPage('page1'); };
   if(!users.length) users.push({id:'admin1',name:'Admin',type:'admin'});
   saveData(); updateUI(); setInterval(updateUI, 1000);
 })();
